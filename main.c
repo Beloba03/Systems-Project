@@ -5,10 +5,9 @@
 
 // Declaration of a 2D character array for city grid layout
 char** cityGrid;
-// Declaration of a file pointer for building data
-FILE* bfd;
+
 // Variables to store x and y dimensions of a building
-unsigned int xbldg, ybldg;
+unsigned int xbldg, ybldg, s1dir, a1dir;
 
 // Define a structure named Car to hold the x and y position of a car in the city grid
 typedef struct {
@@ -195,11 +194,13 @@ void printGrid(unsigned int xSize, unsigned int ySize) {
 // Function to read building data from a file and set up the city grid layout
 void read_file() {
     struct bldg_data bd;  // Declare a building data structure
-    int xbldg, ybldg;     // Assuming these are int, as they are not defined in the provided code.
 
     // Read x and y dimensions of the building from the file
     fread(&xbldg, sizeof(int), 1, bfd);
     fread(&ybldg, sizeof(int), 1, bfd);
+
+    fread(&s1dir, sizeof(int), 1, bfd);
+    fread(&a1dir, sizeof(int), 1, bfd);
 
     // Initialize the city grid based on the read dimensions
     initializeGrid(xbldg, ybldg);
@@ -209,17 +210,17 @@ void read_file() {
     // Iterate until a building with x-coordinate greater than 0 is found
     while (bd.x > 0) {
         // Depending on the building type, update the corresponding cell in the city grid
-        if (strcmp(bldg_t[bd.bt].name, CHG) == 0) {  // Using strcmp since we are comparing strings
-            cityGrid[bd.y*4][bd.x*4] = 'C';
-        } else if (strcmp(bldg_t[bd.bt].name, STB) == 0) {
-            cityGrid[bd.y*4][bd.x*4] = 'S';
-        } else if (strcmp(bldg_t[bd.bt].name, BOTH) == 0) {
-            cityGrid[bd.y*4][bd.x*4] = 'B';
+        if (strcmp(bldg_t[bd.bt].name, "Charge") == 0) {  // Using strcmp since we are comparing strings
+            cityGrid[bd.y*4-2][bd.x*4-2] = 'C';
+        } else if (strcmp(bldg_t[bd.bt].name, "Stable") == 0) {
+            cityGrid[bd.y*4-2][bd.x*4-2] = 'S';
+        } else if (strcmp(bldg_t[bd.bt].name, "Both") == 0) {
+            cityGrid[bd.y*4-2][bd.x*4-2] = 'B';
         }
         
         // Print building details on the console
-        printf("Bldg XY: %d %d Type: %s Quad: %s\n", bd.x, bd.y, 
-            bldg_t[bd.bt].name, bldg_q[bd.qd].name);
+        //printf("Bldg XY: %d %d Type: %s Quad: %s\n", bd.x, bd.y, 
+         //   bldg_t[bd.bt].name, bldg_q[bd.qd].name);
 
         // Read the next building data
         fread(&bd, sizeof(struct bldg_data), 1, bfd);
