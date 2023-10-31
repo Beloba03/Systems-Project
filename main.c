@@ -51,6 +51,24 @@ char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
     }
 }
 
+void getStartAndEndCoordinates(int* xStart, int* yStart, int* xEnd, int* yEnd) {
+    printf("Enter the X-coordinate for the starting point: ");
+    scanf("%d", xStart);
+
+    printf("Enter the Y-coordinate for the starting point: ");
+    scanf("%d", yStart);
+
+    printf("Enter the X-coordinate for the ending point: ");
+    scanf("%d", xEnd);
+
+    printf("Enter the Y-coordinate for the ending point: ");
+    scanf("%d", yEnd);
+
+    getchar(); // Clear any remaining newline characters from the input buffer
+
+    car.x = *xStart * 2;
+    car.y = *yStart * 2;
+}
 
 // Function to set the console's cursor position
 void setCursorPosition(int x, int y) {
@@ -127,8 +145,6 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
         }
         skipVer = !skipVer;
     }
-    car.x = 0;  // Start the car on the outermost left column (the street)
-    car.y = (2 * ySize);  // Start the car on the bottom-most street
 }
 void debugPrint(char *specState)
 {
@@ -250,6 +266,8 @@ int main(int argc, char *argv[]) {
         getchar();  // Wait for a character input before exiting
         return 1;  // Return an error code
     }
+    int xStart, yStart, xEnd, yEnd;
+    getStartAndEndCoordinates(&xStart, &yStart, &xEnd, &yEnd);
     hideCursor();
     // Read the file and set up the city grid layout
     read_file();
