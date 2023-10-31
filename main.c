@@ -14,7 +14,7 @@ typedef struct {
     unsigned int x;  // x-position of the car
     unsigned int y;  // y-position of the car
 } Car;
-
+COORD startOffset;
 
 typedef enum {
     MOVE_UP,
@@ -37,6 +37,37 @@ void hideCursor() {
 
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
+
+COORD getCursorPosition() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    
+    if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+        return csbi.dwCursorPosition;
+    } else {
+        // If there's an error, return a default value or handle as appropriate
+        COORD defaultCoord = {0, 0};
+        return defaultCoord;
+    }
+}
+
+// Function to set the console's cursor position
+void setCursorPosition(int x, int y) {
+    COORD coord;  // Use the COORD struct from Windows API
+    coord.X = x;  // Set the X coordinate
+    coord.Y = y;  // Set the Y coordinate
+    // Set the cursor position using the Windows API function
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+int isSpaceFree(int x, int y) {
+    if (cityGrid[y-startOffset.Y][x] == 'C' || cityGrid[y-startOffset.Y][x] == 'S' || cityGrid[y-startOffset.Y][x] == 'B' || cityGrid[y-startOffset.Y][x] == '#' || cityGrid[y-startOffset.Y][x] == 'O') {
+        return 0; // Space is not free (occupied by a building)
+    }
+    return 1; // Space is free
+}
+
+
 
 char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
     switch (type) {
@@ -102,55 +133,76 @@ void getStartAndEndCoordinates(int* xStart, int* yStart, int* xEnd, int* yEnd) {
     scanf("%d", yEnd);
 
     getchar(); // Clear any remaining newline characters from the input buffer
-
-    car.x = *xStart * 4;
-    car.y = *yStart * 4;
+    startOffset = getCursorPosition();
+    car.x = *xStart * 4 + startOffset.X;
+    car.y = *yStart * 4 + startOffset.Y;
 }
 
-// Function to set the console's cursor position
-void setCursorPosition(int x, int y) {
-    COORD coord;  // Use the COORD struct from Windows API
-    coord.X = x;  // Set the X coordinate
-    coord.Y = y;  // Set the Y coordinate
-    // Set the cursor position using the Windows API function
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
+void updateEndCoordinates(int* xEnd, int* yEnd) {
+    COORD carPos = getCursorPosition();
+    setCursorPosition(0, 4*ybldg+8);
+    printf("Enter the X-coordinate for the ending point: ");
+    scanf("%d", xEnd);
 
-COORD getCursorPosition() {
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-    
-    if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
-        return csbi.dwCursorPosition;
-    } else {
-        // If there's an error, return a default value or handle as appropriate
-        COORD defaultCoord = {0, 0};
-        return defaultCoord;
-    }
+    printf("Enter the Y-coordinate for the ending point: ");
+    scanf("%d", yEnd);
+
+    getchar(); // Clear any remaining newline characters from the input buffer
+    setCursorPosition(carPos.X, carPos.Y);
 }
 
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection) {
-    COORD prevPos = (COORD){car.x, car.y};  // Store the previous position (before updating
-    // Update car's position based on direction
-    switch (carDirection) {
-        case MOVE_UP:
-                car.y--;
-            break;
-        case MOVE_RIGHT:
-                car.x++;
-            break;
-        case MOVE_DOWN:
-                car.y++;
-            break;
-        case MOVE_LEFT:
-                car.x--;
+    COORD prevPos = (COORD){car.x, car.y};  // Store the previous position (before updating)
+    int attempts = 4; // There are 4 directions. The car will attempt to find a free space in each direction.
+
+    while (attempts > 0) {
+        switch (carDirection) {
+            case MOVE_UP:
+                if (isSpaceFree(car.x, car.y - 1)) {
+                    car.y--;
+                    attempts = 0; // Stop the loop
+                } else {
+                    carDirection = MOVE_RIGHT;
+                    attempts--;
+                }
+                break;
+            case MOVE_RIGHT:
+                if (isSpaceFree(car.x + 1, car.y)) {
+                    car.x++;
+                    attempts = 0; // Stop the loop
+                } else {
+                    carDirection = MOVE_DOWN;
+                    attempts--;
+                }
+                break;
+            case MOVE_DOWN:
+                if (isSpaceFree(car.x, car.y + 1)) {
+                    car.y++;
+                    attempts = 0; // Stop the loop
+                } else {
+                    carDirection = MOVE_LEFT;
+                    attempts--;
+                }
+                break;
+            case MOVE_LEFT:
+                if (isSpaceFree(car.x - 1, car.y)) {
+                    car.x--;
+                    attempts = 0; // Stop the loop
+                } else {
+                    carDirection = MOVE_UP;
+                    attempts--;
+                }
+                break;
+        }
     }
+
     setCursorPosition(prevPos.X, prevPos.Y);  // Move cursor to previous position
     printf(" "); // Clear the previous position
     setCursorPosition(car.x, car.y);  // Update for new position
     printf("*");
 }
+
 
 
 // Function to initialize the city grid
@@ -192,9 +244,6 @@ void debugPrint(char *specState)
 }
 // Function to animate car movement on the console
 int animateCar(int xDestination, int yDestination) {
-    // Condition to stop the loop when the car completes a full perimeter loop
-    unsigned int startX = car.x;
-    unsigned int startY = car.y;
     COORD tempCord;
 
     if(car.x < xDestination * 4) {
@@ -311,11 +360,19 @@ int main(int argc, char *argv[]) {
     // Read the file and set up the city grid layout
     read_file();
     // Animate the car's movement on the console
-    int destStatus = 0;
-    while(destStatus == 0)
-    {
-        destStatus = animateCar(xEnd, yEnd);
+    int destStatus = 0, wasDKeyPressed = 0;
+    while (destStatus == 0) {
+    int isDKeyPressed = GetAsyncKeyState('D') & 0x8000;
+
+    if (isDKeyPressed && !wasDKeyPressed) {  // Key just got pressed
+        updateEndCoordinates(&xEnd, &yEnd);  // Prompt user for new destination
     }
+
+    wasDKeyPressed = isDKeyPressed;  // Update the state for the next iteration
+
+    destStatus = animateCar(xEnd, yEnd);
+    Sleep(50);  
+}
     
     // Set the cursor position to the bottom of the grid
     setCursorPosition(0, 4*ybldg+7);
