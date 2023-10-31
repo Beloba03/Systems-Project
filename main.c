@@ -66,8 +66,8 @@ void getStartAndEndCoordinates(int* xStart, int* yStart, int* xEnd, int* yEnd) {
 
     getchar(); // Clear any remaining newline characters from the input buffer
 
-    car.x = *xStart * 2;
-    car.y = *yStart * 2;
+    car.x = *xStart * 4;
+    car.y = *yStart * 4;
 }
 
 // Function to set the console's cursor position
@@ -168,11 +168,11 @@ int animateCar(int xDestination, int yDestination) {
         updateCar(MOVE_LEFT);
         debugPrint("XL");
     }
-    else if(car.y < yDestination * 4) {
+    else if(car.y < yDestination * 4+4) {
         updateCar(MOVE_DOWN);
         debugPrint("YD");
     }
-    else if(car.y > yDestination * 4) {
+    else if(car.y > yDestination * 4+4) {
         updateCar(MOVE_UP);
         debugPrint("YU");
     }
