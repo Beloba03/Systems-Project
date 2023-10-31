@@ -120,10 +120,10 @@ void updateCar(CarDirection carDirection) {
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
     cityGrid = (char**)malloc((4 * ySize + 2) * sizeof(char*));
     int skipVer = 1, skipHor;
-    for (unsigned int i = 0; i < 2 * ySize + 2; i++) {
+    for (unsigned int i = 0; i < 4 * ySize + 2; i++) {
         skipHor = 1;
         cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char));
-        for (unsigned int j = 0; j < 2 * xSize + 2; j++) {
+        for (unsigned int j = 0; j < 4 * xSize + 2; j++) {
             if (i % 4 == 0 || j % 4 == 0) {
                 cityGrid[i][j] = ' ';
                 skipHor = !skipHor;
@@ -149,7 +149,7 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 void debugPrint(char *specState)
 {
     COORD tempCord = getCursorPosition();
-    setCursorPosition(0, 2*ybldg+2);
+    setCursorPosition(0, 4*ybldg+2);
     printf("Car X: %d, Car Y: %d, specState: %s        \n", car.x, car.y, specState);
     setCursorPosition(tempCord.X, tempCord.Y);
 }
@@ -194,13 +194,9 @@ void freeGrid(unsigned int ySize) {
 }
 
 void printGrid(unsigned int xSize, unsigned int ySize) {
-    for (unsigned int y = 0; y < (ySize * 2) + 1; y++) {
-        for (unsigned int x = 0; x < (xSize * 2) + 1; x++) {
-            if (x == car.x + 1 && y == 2*car.y) {
-                printf("*");
-            } else {
+    for (unsigned int y = 0; y < (ySize * 4) + 1; y++) {
+        for (unsigned int x = 0; x < (xSize * 4) + 1; x++) {
                 printf("%c", cityGrid[y][x]);
-            }
         }
         printf("\n");
     }
@@ -275,7 +271,7 @@ int main(int argc, char *argv[]) {
     int destStatus = 0;
     while(destStatus == 0)
     {
-        destStatus = animateCar(3, 2);
+        destStatus = animateCar(xEnd, yEnd);
     }
     
     // Set the cursor position to the bottom of the grid

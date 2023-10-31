@@ -1,13 +1,24 @@
-#include "BldgGen.h"
+ #include <stdio.h>
+#include <stdlib.h>
 #include <windows.h>
+#include <process.h> // Include for _beginthread
+
+#include "BldgGen.h"
+
+FILE* bfd;
 
 char** cityGrid;
-FILE* bfd;
 unsigned int xbldg, ybldg;
 
 typedef struct {
     unsigned int x;
     unsigned int y;
+} CarPosition;
+
+typedef struct {
+    CarPosition currentPos;
+    CarPosition startPos;
+    CarPosition endPos;
 } Car;
 
 typedef enum {
@@ -17,7 +28,8 @@ typedef enum {
     MOVE_LEFT
 } CarDirection;
 
-Car car;
+Car* cars; // Array to store multiple cars
+int numCars; // Number of cars in the simulation
 
 void hideCursor() {
     HANDLE hConsoleOutput;
@@ -30,38 +42,25 @@ void hideCursor() {
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
 
-void getStartAndEndCoordinates(int *xStart, int *yStart, int *xEnd, int *yEnd) {
+void getStartAndEndCoordinates(Car* car) {
     printf("Enter the X-coordinate for the starting point: ");
-    scanf("%d", xStart);
+    scanf("%d", &(car->startPos.x));
+    while (getchar() != '\n'); // Clear the input buffer
 
     printf("Enter the Y-coordinate for the starting point: ");
-    scanf("%d", yStart);
+    scanf("%d", &(car->startPos.y));
+    while (getchar() != '\n'); // Clear the input buffer
 
     printf("Enter the X-coordinate for the ending point: ");
-    scanf("%d", xEnd);
+    scanf("%d", &(car->endPos.x));
+    while (getchar() != '\n'); // Clear the input buffer
 
     printf("Enter the Y-coordinate for the ending point: ");
-    scanf("%d", yEnd);
+    scanf("%d", &(car->endPos.y));
+    while (getchar() != '\n'); // Clear the input buffer
 
-    getchar(); // Clear any remaining newline characters from the input buffer
-
-    car.x = *xStart * 2;
-    car.y = *yStart * 2;
-}
-
-
-
-char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
-    switch (type) {
-        case CHG:
-            return 'C';
-        case STB:
-            return 'S';
-        case BOTH:
-            return 'B';
-        default:
-            return ' ';
-    }
+    // Initialize the car's current position to its starting position
+    car->currentPos = car->startPos;
 }
 
 void setCursorPosition(int x, int y) {
@@ -83,24 +82,24 @@ COORD getCursorPosition() {
     }
 }
 
-void updateCar(CarDirection carDirection) {
-    COORD prevPos = (COORD){car.x, car.y};
+void updateCar(Car* car, CarDirection carDirection) {
+    COORD prevPos = (COORD){car->currentPos.x, car->currentPos.y};
     switch (carDirection) {
         case MOVE_UP:
-            car.y--;
+            car->currentPos.y--;
             break;
         case MOVE_RIGHT:
-            car.x++;
+            car->currentPos.x++;
             break;
         case MOVE_DOWN:
-            car.y++;
+            car->currentPos.y++;
             break;
         case MOVE_LEFT:
-            car.x--;
+            car->currentPos.x--;
     }
     setCursorPosition(prevPos.X, prevPos.Y);
     printf(" ");
-    setCursorPosition(car.x, car.y);
+    setCursorPosition(car->currentPos.x, car->currentPos.y);
     printf("*");
 }
 
@@ -119,13 +118,6 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
             }
         }
     }
-}
-
-void debugPrint(char *specState) {
-    COORD tempCord = getCursorPosition();
-    setCursorPosition(0, 2 * ybldg + 2);
-    printf("Car X: %d, Car Y: %d, specState: %s        \n", car.x, car.y, specState);
-    setCursorPosition(tempCord.X, tempCord.Y);
 }
 
 int isPathClear(int startX, int startY, int endX, int endY) {
@@ -162,36 +154,42 @@ int isPathClear(int startX, int startY, int endX, int endY) {
     return 1; // Path is clear
 }
 
-int animateCar(int xDestination, int yDestination) {
-    while (car.x != xDestination * 2 || car.y != yDestination * 2) {
-        int xDiff = xDestination * 2 - car.x;
-        int yDiff = yDestination * 2 - car.y;
+// Function to animate a car
+int animateCar(Car* car) {
+    int xDiff = (car->endPos.x - car->currentPos.x) * 2; // Adjust for larger grid cells
+    int yDiff = (car->endPos.y - car->currentPos.y) * 2; // Adjust for larger grid cells
 
-        // Check if the car has reached the destination
-        if (xDiff == 0 && yDiff == 0) {
-            break;
-        }
-
+    while (xDiff != 0 || yDiff != 0) {
         // Calculate the horizontal and vertical move directions
         int xDirection = (xDiff > 0) ? 1 : (xDiff < 0) ? -1 : 0;
         int yDirection = (yDiff > 0) ? 1 : (yDiff < 0) ? -1 : 0;
 
         // Try to move horizontally if there is space
-        if (xDiff != 0 && cityGrid[car.y][car.x + xDirection] == ' ') {
-            updateCar((xDirection > 0) ? MOVE_RIGHT : MOVE_LEFT);
+        if (xDiff != 0 && cityGrid[car->currentPos.y][car->currentPos.x + xDirection] == ' ') {
+            updateCar(car, (xDirection > 0) ? MOVE_RIGHT : MOVE_LEFT);
+            xDiff -= xDirection;
+            Sleep(200); // Add a delay for visualization using Sleep
         }
         // If horizontal move is not possible, try to move vertically
-        else if (yDiff != 0 && cityGrid[car.y + yDirection][car.x] == ' ') {
-            updateCar((yDirection > 0) ? MOVE_DOWN : MOVE_UP);
+        else if (yDiff != 0 && cityGrid[car->currentPos.y + yDirection][car->currentPos.x] == ' ') {
+            updateCar(car, (yDirection > 0) ? MOVE_DOWN : MOVE_UP);
+            yDiff -= yDirection;
+            Sleep(200); // Add a delay for visualization using Sleep
         } else {
             // If no valid moves are possible, wait for 200 milliseconds
             Sleep(200);
         }
     }
 
-    return 0; // Return 0 to indicate successful completion
+    // Return 1 only after reaching the destination
+    return 1; // Successful animation
 }
 
+// Thread function to animate a car
+void animateCarThread(void* param) {
+    Car* car = (Car*)param;
+    animateCar(car);
+}
 
 void freeGrid(unsigned int ySize) {
     for (unsigned int i = 0; i < ySize + 1; i++) {
@@ -234,6 +232,15 @@ void read_file() {
     freeGrid(ybldg);
 }
 
+void initializeCars(int num) {
+    numCars = num;
+    cars = (Car*)malloc(numCars * sizeof(Car));
+    if (cars == NULL) {
+        printf("Memory allocation failed for cars.\n");
+        exit(1);
+    }
+}
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         printf("Supply the name of the data file\n");
@@ -251,19 +258,50 @@ int main(int argc, char* argv[]) {
 
     read_file();
 
-    int xStart, yStart, xEnd, yEnd;
-    getStartAndEndCoordinates(&xStart, &yStart, &xEnd, &yEnd);
+    printf("Enter the number of cars: ");
+    scanf("%d", &numCars);
 
-    int destStatus = 0;
-    while (destStatus == 0) {
-        destStatus = animateCar(xEnd, yEnd);
+    // Clear the input buffer
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    initializeCars(numCars);
+
+    HANDLE* carThreads = (HANDLE*)malloc(numCars * sizeof(HANDLE));
+    if (carThreads == NULL) {
+        printf("Memory allocation failed for carThreads.\n");
+        exit(1);
     }
 
-    setCursorPosition(0, 2 * ybldg + 2);
-    printf("                      ");
-    setCursorPosition(0, 2 * ybldg + 2);
-    printf("\nDone\n");
+    // Start a separate thread for each car
+    for (int i = 0; i < numCars; i++) {
+        getStartAndEndCoordinates(&cars[i]);
+        carThreads[i] = (HANDLE)_beginthread(animateCarThread, 0, &cars[i]);
+    }
 
-    printf("\nPress Enter to exit...");
-    getchar();
+    int destStatus = numCars; // Initialize destStatus to the number of cars
+
+    // Update the console while animation is in progress
+    while (destStatus > 0) {
+        // Sleep briefly to avoid high CPU usage
+        Sleep(100);
+
+        // Check if any cars have reached their destinations
+        destStatus = 0;
+        for (int i = 0; i < numCars; i++) {
+            if (cars[i].currentPos.x != cars[i].endPos.x || cars[i].currentPos.y != cars[i].endPos.y) {
+                destStatus++;
+            }
+        }
+    }
+
+    // Close thread handles
+    for (int i = 0; i < numCars; i++) {
+        CloseHandle(carThreads[i]);
+    }
+
+    free(carThreads); // Free thread handles
+    free(cars); // Free memory for cars
+
+    return 0;
 }
