@@ -31,10 +31,10 @@ enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
 /* Building record structure */
 struct bldg_data
 {
-int x;
-int y;
-enum BLDG_TYPE bt;
-enum QUAD qd;
+	int x;
+	int y;
+	enum BLDG_TYPE bt;
+	enum QUAD qd;
 };
 
 /* List of valid responses and codes */

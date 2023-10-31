@@ -51,6 +51,43 @@ char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
     }
 }
 
+COORD convertBuildingCoord(int x, int y, enum QUAD location)
+{
+    COORD tempCord = {x, y};
+    switch(location) {
+        case NE:
+            tempCord.X -= 1;
+            tempCord.Y -= 1;
+            break;
+        case N:
+            tempCord.Y -= 1;
+            break;
+        case NW:
+            tempCord.X += 1;
+            tempCord.Y -= 1;
+            break;
+        case W:
+            tempCord.X += 1;
+            break;
+        case SW:
+            tempCord.X += 1;
+            tempCord.Y += 1;
+            break;
+        case S:
+            tempCord.Y += 1;
+            break;
+        case SE:
+            tempCord.X -= 1;
+            tempCord.Y += 1;
+            break;
+        case E:
+            tempCord.X -= 1;
+            break;
+        default:
+            break;
+    }
+    return tempCord;
+}
 void getStartAndEndCoordinates(int* xStart, int* yStart, int* xEnd, int* yEnd) {
     printf("Enter the X-coordinate for the starting point: ");
     scanf("%d", xStart);
@@ -149,7 +186,7 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 void debugPrint(char *specState)
 {
     COORD tempCord = getCursorPosition();
-    setCursorPosition(0, 4*ybldg+2);
+    setCursorPosition(0, 4*ybldg+8);
     printf("Car X: %d, Car Y: %d, specState: %s        \n", car.x, car.y, specState);
     setCursorPosition(tempCord.X, tempCord.Y);
 }
@@ -220,14 +257,20 @@ void read_file() {
     // Read building data and set up the city grid
     fread(&bd, sizeof(struct bldg_data), 1, bfd);
     // Iterate until a building with x-coordinate greater than 0 is found
+    COORD tempCoord;
     while (bd.x > 0) {
         // Depending on the building type, update the corresponding cell in the city grid
         if (strcmp(bldg_t[bd.bt].name, "Charge") == 0) {  // Using strcmp since we are comparing strings
-            cityGrid[bd.y*4-2][bd.x*4-2] = 'C';
+            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            cityGrid[tempCoord.Y][tempCoord.X] = 'C';
         } else if (strcmp(bldg_t[bd.bt].name, "Stable") == 0) {
-            cityGrid[bd.y*4-2][bd.x*4-2] = 'S';
+            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            cityGrid[tempCoord.Y][tempCoord.X] = 'S';
         } else if (strcmp(bldg_t[bd.bt].name, "Both") == 0) {
-            cityGrid[bd.y*4-2][bd.x*4-2] = 'B';
+            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            // printf("X: %d(%d), Y: %d(%d), QUAD: %s\n", bd.x, bd.x*4-2, bd.y, bd.y*4-2,bldg_q[bd.qd].name);
+            // printf("tX: %d, tY: %d\n", tempCoord.X, tempCoord.Y);
+            cityGrid[tempCoord.Y][tempCoord.X] = 'B';
         }
         
         // Print building details on the console
@@ -275,7 +318,7 @@ int main(int argc, char *argv[]) {
     }
     
     // Set the cursor position to the bottom of the grid
-    setCursorPosition(0, 2*ybldg);
+    setCursorPosition(0, 4*ybldg+7);
     printf("\nDone\n");  // Print the "Done" message
     (void) getchar();  // Wait for a character input before exiting
 
