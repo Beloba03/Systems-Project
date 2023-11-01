@@ -13,6 +13,7 @@ unsigned int xbldg, ybldg, s1dir, a1dir;
 typedef struct {
     unsigned int x;  // x-position of the car
     unsigned int y;  // y-position of the car
+    COORD endPos;
 } Car;
 COORD startOffset;
 
@@ -24,7 +25,7 @@ typedef enum {
 } CarDirection;
 
 // Declare a variable of type Car
-Car car;
+Car *car;
 
 void hideCursor() {
     HANDLE hConsoleOutput;
@@ -119,48 +120,58 @@ COORD convertBuildingCoord(int x, int y, enum QUAD location)
     }
     return tempCord;
 }
-void getStartAndEndCoordinates(int* xStart, int* yStart, int* xEnd, int* yEnd) {
-    printf("Enter the X-coordinate for the starting point: ");
-    scanf("%d", xStart);
+int getStartAndEndCoordinates() {
+    int numCars;
+    printf("How many AEDVs would you like to create?: ");
+    scanf("%i", &numCars);
+    COORD tempCoord[numCars];
+    car = (Car*)malloc(numCars * sizeof(Car));
+    for(int i = 0; i < numCars; i++)
+    {
+        printf("Enter the X Y coordinate for the starting point for car %i: ", i);
+        scanf("%i", &tempCoord[i].X);
+        scanf("%i", &tempCoord[i].Y);
 
-    printf("Enter the Y-coordinate for the starting point: ");
-    scanf("%d", yStart);
-
-    printf("Enter the X-coordinate for the ending point: ");
-    scanf("%d", xEnd);
-
-    printf("Enter the Y-coordinate for the ending point: ");
-    scanf("%d", yEnd);
+        printf("Enter the X Y coordinate for the ending point for car %i: ", i);
+        scanf("%i", &car[i].endPos.X);
+        scanf("%i", &car[i].endPos.Y);
+    }
 
     getchar(); // Clear any remaining newline characters from the input buffer
     startOffset = getCursorPosition();
-    car.x = *xStart * 4 + startOffset.X;
-    car.y = *yStart * 4 + startOffset.Y;
+    for(int i = 0; i < numCars; i++)
+    {
+        car[i].x = tempCoord[i].X * 4 + startOffset.X;
+        car[i].y = tempCoord[i].Y * 4 + startOffset.Y;
+    }
+    return numCars;
+    
 }
 
-void updateEndCoordinates(int* xEnd, int* yEnd) {
+void updateEndCoordinates() {
     COORD carPos = getCursorPosition();
+    int carNum;
     setCursorPosition(0, 4*ybldg+8);
-    printf("Enter the X-coordinate for the ending point: ");
-    scanf("%d", xEnd);
-
-    printf("Enter the Y-coordinate for the ending point: ");
-    scanf("%d", yEnd);
+    printf("Enter the car number you would like to update: ");
+    scanf("%d", &carNum);
+    printf("Enter the X Y coordinate for the ending point for car %i: ", carNum);
+    scanf("%d", &car[carNum].endPos.X);
+    scanf("%d", &car[carNum].endPos.Y);
 
     getchar(); // Clear any remaining newline characters from the input buffer
     setCursorPosition(carPos.X, carPos.Y);
 }
 
 // Function to update car's position on the console
-void updateCar(CarDirection carDirection) {
-    COORD prevPos = (COORD){car.x, car.y};  // Store the previous position (before updating)
+void updateCar(CarDirection carDirection, int carNum) {
+    COORD prevPos = (COORD){car[carNum].x, car[carNum].y};  // Store the previous position (before updating)
     int attempts = 4; // There are 4 directions. The car will attempt to find a free space in each direction.
 
     while (attempts > 0) {
         switch (carDirection) {
             case MOVE_UP:
-                if (isSpaceFree(car.x, car.y - 1)) {
-                    car.y--;
+                if (isSpaceFree(car[carNum].x, car[carNum].y - 1)) {
+                    car[carNum].y--;
                     attempts = 0; // Stop the loop
                 } else {
                     carDirection = MOVE_RIGHT;
@@ -168,8 +179,8 @@ void updateCar(CarDirection carDirection) {
                 }
                 break;
             case MOVE_RIGHT:
-                if (isSpaceFree(car.x + 1, car.y)) {
-                    car.x++;
+                if (isSpaceFree(car[carNum].x + 1, car[carNum].y)) {
+                    car[carNum].x++;
                     attempts = 0; // Stop the loop
                 } else {
                     carDirection = MOVE_DOWN;
@@ -177,8 +188,8 @@ void updateCar(CarDirection carDirection) {
                 }
                 break;
             case MOVE_DOWN:
-                if (isSpaceFree(car.x, car.y + 1)) {
-                    car.y++;
+                if (isSpaceFree(car[carNum].x, car[carNum].y + 1)) {
+                    car[carNum].y++;
                     attempts = 0; // Stop the loop
                 } else {
                     carDirection = MOVE_LEFT;
@@ -186,8 +197,8 @@ void updateCar(CarDirection carDirection) {
                 }
                 break;
             case MOVE_LEFT:
-                if (isSpaceFree(car.x - 1, car.y)) {
-                    car.x--;
+                if (isSpaceFree(car[carNum].x - 1, car[carNum].y)) {
+                    car[carNum].x--;
                     attempts = 0; // Stop the loop
                 } else {
                     carDirection = MOVE_UP;
@@ -199,8 +210,8 @@ void updateCar(CarDirection carDirection) {
 
     setCursorPosition(prevPos.X, prevPos.Y);  // Move cursor to previous position
     printf(" "); // Clear the previous position
-    setCursorPosition(car.x, car.y);  // Update for new position
-    printf("*");
+    setCursorPosition(car[carNum].x, car[carNum].y);  // Update for new position
+    printf("%i", carNum);
 }
 
 
@@ -208,74 +219,80 @@ void updateCar(CarDirection carDirection) {
 // Function to initialize the city grid
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
     cityGrid = (char**)malloc((4 * ySize + 2) * sizeof(char*));
+    if(cityGrid == NULL)
+    {
+        printf("Failed to allocate memory for cityGrid");
+        EXIT_FAILURE;
+    }
     int skipVer = 1, skipHor;
+    printf("here1");
     for (unsigned int i = 0; i < 4 * ySize + 2; i++) {
         skipHor = 1;
         cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char));
         for (unsigned int j = 0; j < 4 * xSize + 2; j++) {
             if (i % 4 == 0 || j % 4 == 0) {
+                printf("here2");
                 cityGrid[i][j] = ' ';
                 skipHor = !skipHor;
             }
             else if(skipVer != 0){
                 if(skipHor != 1)
                 {
+                    printf("here3");
                     cityGrid[i][j] = 'O';
                     skipHor = !skipHor;
                 }
                 else
                 {
+                    printf("here4");
                     cityGrid[i][j] = '#';
                     skipHor = !skipHor;
                 }
             }
             else
                 cityGrid[i][j] = 'O';
+                printf("here5");
         }
+        printf("here6");
         skipVer = !skipVer;
+        printf("here7");
     }
 }
 void debugPrint(char *specState)
 {
     COORD tempCord = getCursorPosition();
     setCursorPosition(0, 4*ybldg+8);
-    printf("Car X: %d, Car Y: %d, specState: %s        \n", car.x, car.y, specState);
+    //printf("Car X: %d, Car Y: %d, specState: %s        \n", car[1].x, car[1].y, specState);
     setCursorPosition(tempCord.X, tempCord.Y);
 }
 // Function to animate car movement on the console
-int animateCar(int xDestination, int yDestination) {
+void animateCar(int carNum) {
     COORD tempCord;
 
-    if(car.x < xDestination * 4) {
-        updateCar(MOVE_RIGHT);
+    if(car[carNum].x < car[carNum].endPos.X * 4) {
+        updateCar(MOVE_RIGHT, carNum);
         debugPrint("XR");
     }   
-    else if(car.x > xDestination * 4) {
-        updateCar(MOVE_LEFT);
+    else if(car[carNum].x > car[carNum].endPos.X * 4) {
+        updateCar(MOVE_LEFT, carNum);
         debugPrint("XL");
     }
-    else if(car.y < yDestination * 4+4) {
-        updateCar(MOVE_DOWN);
+    else if(car[carNum].y < car[carNum].endPos.Y * 4+3) {
+        updateCar(MOVE_DOWN, carNum);
         debugPrint("YD");
     }
-    else if(car.y > yDestination * 4+4) {
-        updateCar(MOVE_UP);
+    else if(car[carNum].y > car[carNum].endPos.Y * 4+3) {
+        updateCar(MOVE_UP, carNum);
         debugPrint("YU");
     }
-    else {
-        return 1;
-    }
     Sleep(200);
-    return 0;
 }
 
 // Function to free allocated memory for the city grid
 void freeGrid(unsigned int ySize) {
-    // Free memory for each row
-    for (unsigned int i = 0; i < ySize + 1; i++) {
+    for (unsigned int i = 0; i < (4 * ySize + 2); i++) {
         free(cityGrid[i]);
     }
-    // Free memory for the city grid
     free(cityGrid);
 }
 
@@ -329,7 +346,6 @@ void read_file() {
         // Read the next building data
         fread(&bd, sizeof(struct bldg_data), 1, bfd);
     }
-
     // Close the file
     fclose(bfd);
     // Print the city grid on the console
@@ -354,23 +370,26 @@ int main(int argc, char *argv[]) {
         getchar();  // Wait for a character input before exiting
         return 1;  // Return an error code
     }
-    int xStart, yStart, xEnd, yEnd;
-    getStartAndEndCoordinates(&xStart, &yStart, &xEnd, &yEnd);
+    int numCars;
+    numCars = getStartAndEndCoordinates();
     hideCursor();
     // Read the file and set up the city grid layout
     read_file();
     // Animate the car's movement on the console
     int destStatus = 0, wasDKeyPressed = 0;
-    while (destStatus == 0) {
+    while (1) {
     int isDKeyPressed = GetAsyncKeyState('D') & 0x8000;
 
     if (isDKeyPressed && !wasDKeyPressed) {  // Key just got pressed
-        updateEndCoordinates(&xEnd, &yEnd);  // Prompt user for new destination
+        updateEndCoordinates();  // Prompt user for new destination
     }
 
     wasDKeyPressed = isDKeyPressed;  // Update the state for the next iteration
-
-    destStatus = animateCar(xEnd, yEnd);
+    for(int i = 0; i < numCars; i++)
+    {
+        animateCar(i);
+    }
+    
     Sleep(50);  
 }
     
