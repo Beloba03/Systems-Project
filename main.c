@@ -125,19 +125,18 @@ int getStartAndEndCoordinates() {
     printf("How many AEDVs would you like to create?: ");
     scanf("%i", &numCars);
     COORD tempCoord[numCars];
-    car = (Car*)malloc(numCars * sizeof(Car));
+    car = (Car*)malloc(numCars * sizeof(Car)+1);
     for(int i = 0; i < numCars; i++)
     {
         printf("Enter the X Y coordinate for the starting point for car %i: ", i);
-        scanf("%i", &tempCoord[i].X);
-        scanf("%i", &tempCoord[i].Y);
+        scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
 
         printf("Enter the X Y coordinate for the ending point for car %i: ", i);
-        scanf("%i", &car[i].endPos.X);
-        scanf("%i", &car[i].endPos.Y);
+        scanf("%i%i", &car[i].endPos.X, &car[i].endPos.Y);
     }
 
-    getchar(); // Clear any remaining newline characters from the input buffer
+    // clear the input buffer
+    while((getchar()) != '\n');
     startOffset = getCursorPosition();
     for(int i = 0; i < numCars; i++)
     {
@@ -210,7 +209,7 @@ void updateCar(CarDirection carDirection, int carNum) {
 
     setCursorPosition(prevPos.X, prevPos.Y);  // Move cursor to previous position
     printf(" "); // Clear the previous position
-    setCursorPosition(car[carNum].x, car[carNum].y);  // Update for new position
+    setCursorPosition(car[carNum].x - startOffset.X, car[carNum].y);  // Update for new position
     printf("%i", carNum);
 }
 
@@ -218,44 +217,44 @@ void updateCar(CarDirection carDirection, int carNum) {
 
 // Function to initialize the city grid
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
-    cityGrid = (char**)malloc((4 * ySize + 2) * sizeof(char*));
+    cityGrid = (char**)malloc((4 * ySize + 6) * sizeof(char*));
     if(cityGrid == NULL)
     {
         printf("Failed to allocate memory for cityGrid");
-        EXIT_FAILURE;
+        getchar();
+        exit(EXIT_FAILURE);
     }
     int skipVer = 1, skipHor;
-    printf("here1");
     for (unsigned int i = 0; i < 4 * ySize + 2; i++) {
         skipHor = 1;
         cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char));
+        if(cityGrid[i] == NULL)
+        {
+            printf("Failed to allocate memory for cityGrid[%d]", i);
+            getchar();
+            exit(EXIT_FAILURE);
+        }
         for (unsigned int j = 0; j < 4 * xSize + 2; j++) {
             if (i % 4 == 0 || j % 4 == 0) {
-                printf("here2");
                 cityGrid[i][j] = ' ';
                 skipHor = !skipHor;
             }
             else if(skipVer != 0){
                 if(skipHor != 1)
                 {
-                    printf("here3");
                     cityGrid[i][j] = 'O';
                     skipHor = !skipHor;
                 }
                 else
                 {
-                    printf("here4");
                     cityGrid[i][j] = '#';
                     skipHor = !skipHor;
                 }
             }
             else
                 cityGrid[i][j] = 'O';
-                printf("here5");
         }
-        printf("here6");
         skipVer = !skipVer;
-        printf("here7");
     }
 }
 void debugPrint(char *specState)
@@ -277,11 +276,11 @@ void animateCar(int carNum) {
         updateCar(MOVE_LEFT, carNum);
         debugPrint("XL");
     }
-    else if(car[carNum].y < car[carNum].endPos.Y * 4+3) {
+    else if(car[carNum].y < car[carNum].endPos.Y * 4 + startOffset.Y) {
         updateCar(MOVE_DOWN, carNum);
         debugPrint("YD");
     }
-    else if(car[carNum].y > car[carNum].endPos.Y * 4+3) {
+    else if(car[carNum].y > car[carNum].endPos.Y * 4 + startOffset.Y) {
         updateCar(MOVE_UP, carNum);
         debugPrint("YU");
     }
@@ -294,9 +293,11 @@ void freeGrid(unsigned int ySize) {
         free(cityGrid[i]);
     }
     free(cityGrid);
+    free(car);
 }
 
 void printGrid(unsigned int xSize, unsigned int ySize) {
+    setCursorPosition(startOffset.X, startOffset.Y);
     for (unsigned int y = 0; y < (ySize * 4) + 1; y++) {
         for (unsigned int x = 0; x < (xSize * 4) + 1; x++) {
                 printf("%c", cityGrid[y][x]);
@@ -350,8 +351,8 @@ void read_file() {
     fclose(bfd);
     // Print the city grid on the console
     printGrid(xbldg, ybldg);
-    // Free the allocated memory for the city grid
-    freeGrid(ybldg);
+
+    
 }
 
 
@@ -397,6 +398,6 @@ int main(int argc, char *argv[]) {
     setCursorPosition(0, 4*ybldg+7);
     printf("\nDone\n");  // Print the "Done" message
     (void) getchar();  // Wait for a character input before exiting
-
+    freeGrid(ybldg);
     return 0;  // Return a success code
 }
