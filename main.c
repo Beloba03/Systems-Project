@@ -14,6 +14,7 @@ typedef struct {
     unsigned int x;  // x-position of the car
     unsigned int y;  // y-position of the car
     COORD endPos;
+    enum QUAD endQuad;
 } Car;
 COORD startOffset;
 
@@ -26,6 +27,7 @@ typedef enum {
 
 // Declare a variable of type Car
 Car *car;
+struct bldg_data bd;  // Declare a building data structure
 
 void hideCursor() {
     HANDLE hConsoleOutput;
@@ -38,7 +40,42 @@ void hideCursor() {
 
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
-
+COORD convertBuildingCoordToStreet(COORD tempCoord, enum QUAD location)
+{
+    switch(location) {
+        case NE:
+            tempCoord.X -= 1;
+            tempCoord.Y -= 2;
+            break;
+        case N:
+            tempCoord.Y -= 2;
+            break;
+        case NW:
+            tempCoord.X += 1;
+            tempCoord.Y -= 2;
+            break;
+        case W:
+            tempCoord.X += 2;
+            break;
+        case SW:
+            tempCoord.X += 1;
+            tempCoord.Y += 2;
+            break;
+        case S:
+            tempCoord.Y += 2;
+            break;
+        case SE:
+            tempCoord.X -= 1;
+            tempCoord.Y += 2;
+            break;
+        case E:
+            tempCoord.X -= 1;
+            break;
+        default:
+            break;
+    }
+    return tempCoord;
+}
 void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -133,6 +170,87 @@ COORD convertBuildingCoord(int x, int y, enum QUAD location)
     }
     return tempCord;
 }
+// Function to map integer to QUAD enum
+enum QUAD mapIntToQuad(int quadInt) {
+    switch(quadInt) {
+        case 1:
+            return N;
+        case 2:
+            return NW;
+        case 3:
+            return W;
+        case 4:
+            return SW;
+        case 5:
+            return S;
+        case 6:
+            return SE;
+        case 7:
+            return E;
+        case 8:
+            return NE;
+        default:
+            printf("Invalid quadrant number entered.\n");
+            exit(1);
+    }
+}
+
+// void debugPrint(int state, int other, int under, int complete) {
+//     COORD tempCord = getCursorPosition();
+//     setCursorPosition(0, 4*ybldg+8);
+//     printf("Start X: %d, Start Y: %d, End X: %d, End Y: %d      \n", state , other, under, complete);
+//     setCursorPosition(tempCord.X, tempCord.Y);
+// }
+
+// int getStartAndEndCoordinates() {
+//     int numCars;
+//     printf("How many AEDVs would you like to create?: ");
+//     scanf("%i", &numCars);
+    
+//     COORD tempCoord, holdCoord;
+//     car = (Car*)malloc(numCars * sizeof(Car));
+    
+//     if (car == NULL) {
+//         printf("Memory allocation failed.\n");
+//         exit(1);
+//     }
+    
+//     int quad;
+//     enum QUAD tempQuad;
+    
+//     for(int i = 0; i < numCars; i++) {
+//         printf("Enter the X Y QUAD coordinate for the starting point for car %i: ", i);
+//         scanf("%i%i%i", &tempCoord.X, &tempCoord.Y, &quad);
+
+//         tempQuad = mapIntToQuad(quad);
+
+//         holdCoord = convertBuildingCoordToStreet(tempCoord, tempQuad);
+        
+//         printf("Enter the X Y QUAD coordinate for the ending point for car %i: ", i);
+//         scanf("%i%i%i", &tempCoord.X, &tempCoord.Y, &quad);
+        
+//         tempQuad = mapIntToQuad(quad);
+
+//         tempCoord = convertBuildingCoordToStreet(tempCoord, tempQuad);
+//         car[i].x = holdCoord.X;
+//         car[i].y = holdCoord.Y;
+//         car[i].endPos.X = tempCoord.X;
+//         car[i].endPos.Y = tempCoord.Y;
+
+//         debugPrint(car[i].x, car[i].y, car[i].endPos.X, car[i].endPos.Y);
+//     }
+
+//     // clear the input buffer
+//     while((getchar()) != '\n');
+    
+//     COORD startOffset = getCursorPosition();
+//     for(int i = 0; i < numCars; i++) {
+//         car[i].x = car[i].x * 4 + startOffset.X;
+//         car[i].y = car[i].y * 4 + startOffset.Y;
+//     }
+    
+//     return numCars;
+// }
 int getStartAndEndCoordinates() {
     int numCars;
     printf("How many AEDVs would you like to create?: ");
@@ -143,9 +261,10 @@ int getStartAndEndCoordinates() {
     {
         printf("Enter the X Y coordinate for the starting point for car %i: ", i);
         scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
-
-        printf("Enter the X Y coordinate for the ending point for car %i: ", i);
-        scanf("%i%i", &car[i].endPos.X, &car[i].endPos.Y);
+        int tempQuad;
+        printf("Enter the X Y Quad coordinate for the ending point for car %i: ", i);
+        scanf("%i%i%i", &car[i].endPos.X, &car[i].endPos.Y, &tempQuad);
+        car[i].endQuad = mapIntToQuad(tempQuad);
     }
 
     // clear the input buffer
@@ -153,12 +272,16 @@ int getStartAndEndCoordinates() {
     startOffset = getCursorPosition();
     for(int i = 0; i < numCars; i++)
     {
-        car[i].x = tempCoord[i].X * 4 + startOffset.X;
+        car[i].x = tempCoord[i].X * 4 + startOffset.X-2;
         car[i].y = tempCoord[i].Y * 4 + startOffset.Y;
+
+        car[i].endPos.X = 4*car[i].endPos.X;
+        car[i].endPos.Y = 4*car[i].endPos.Y;
     }
     return numCars;
     
 }
+
 
 void updateEndCoordinates() {
     COORD carPos = getCursorPosition();
@@ -270,36 +393,494 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
         skipVer = !skipVer;
     }
 }
-void debugPrint(char *specState)
-{
-    COORD tempCord = getCursorPosition();
-    setCursorPosition(0, 4*ybldg+8);
-    //printf("Car X: %d, Car Y: %d, specState: %s        \n", car[1].x, car[1].y, specState);
-    setCursorPosition(tempCord.X, tempCord.Y);
-}
-// Function to animate car movement on the console
 void animateCar(int carNum) {
     COORD tempCord;
-
-    if(car[carNum].x < car[carNum].endPos.X * 4) {
+    static int toggle = 0, count, toggleInside = 0;
+    if(car[carNum].x < car[carNum].endPos.X && toggle == 0) {
         updateCar(MOVE_RIGHT, carNum);
-        debugPrint("XR");
+        toggleInside = 0;
+        //debugPrint("XR");
     }   
-    else if(car[carNum].x > car[carNum].endPos.X * 4) {
+    else if(car[carNum].x > car[carNum].endPos.X && toggle == 0) {
         updateCar(MOVE_LEFT, carNum);
-        debugPrint("XL");
+        toggleInside = 0;
+        //debugPrint("XL");
     }
-    else if(car[carNum].y < car[carNum].endPos.Y * 4 + startOffset.Y) {
+    else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
         updateCar(MOVE_DOWN, carNum);
-        debugPrint("YD");
+        toggleInside = 0;
+        //debugPrint("YD");
     }
-    else if(car[carNum].y > car[carNum].endPos.Y * 4 + startOffset.Y) {
+    else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
         updateCar(MOVE_UP, carNum);
-        debugPrint("YU");
+        toggleInside = 0;
+        ///debugPrint("YU");
+    }
+    else{
+        toggle = 1;
+        if(car[carNum].endQuad == S)
+        {
+            if(toggleInside == 0)
+            {
+                count = 2;
+                toggleInside = 1;
+            }
+            if(count > 0)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else
+                toggleInside = 2;
+            
+            
+        }
+        if(car[carNum].endQuad == SW)
+        {
+            if(toggleInside == 0)
+            {
+                count = 1;
+                toggleInside = 1;
+            }
+            if(count > 0)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else
+                toggleInside = 2;
+        }
+        if(car[carNum].endQuad == W)
+        {
+            if(toggleInside == 0)
+            {
+                count = 2;
+                toggleInside = 1;
+            }
+            if(count > 0)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else
+                toggleInside = 2;
+        }
+        if(car[carNum].endQuad == SW)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else
+                toggleInside = 2;
+        }
+        if(car[carNum].endQuad == NW)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0 && toggleInside == 1)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else if(toggleInside == 1)
+                toggleInside = 2;
+            if(toggleInside == 2)
+            {
+                count = 2;
+                toggleInside = 3;
+            }
+            if(count > 0 && toggleInside == 3)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else if(toggleInside == 3)
+                toggleInside = 4;
+        }
+            if(car[carNum].endQuad == NE)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0 && toggleInside == 1)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else if(toggleInside == 1)
+                toggleInside = 2;
+            if(toggleInside == 2)
+            {
+                count = 4;
+                toggleInside = 3;
+            }
+            if(count > 0 && toggleInside == 3)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else if(toggleInside == 3)
+                toggleInside = 4;
+            
+        }
+        if(car[carNum].endQuad == N)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0 && toggleInside == 1)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else if(toggleInside == 1)
+                toggleInside = 2;
+            if(toggleInside == 2)
+            {
+                count = 3;
+                toggleInside = 3;
+            }
+            if(count > 0 && toggleInside == 3)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else if(toggleInside == 3)
+                toggleInside = 4;
+        }
+        if(car[carNum].endQuad == NW)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0 && toggleInside == 1)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else if(toggleInside == 1)
+                toggleInside = 2;
+            if(toggleInside == 2)
+            {
+                count = 3;
+                toggleInside = 3;
+            }
+            if(count > 0 && toggleInside == 3)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else if(toggleInside == 3)
+                toggleInside = 4;
+        }
+        if(car[carNum].endQuad == W)
+        {
+            if(toggleInside == 0)
+            {
+                count = 3;
+                toggleInside = 1;
+            }
+            if(count > 0 && toggleInside == 1)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else if(toggleInside == 1)
+                toggleInside = 2;
+            if(toggleInside == 2)
+            {
+                count = 3;
+                toggleInside = 3;
+            }
+            if(count > 0 && toggleInside == 3)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            else if(toggleInside == 3)
+                toggleInside = 4;
+        }
     }
     Sleep(200);
 }
 
+// Function to animate car movement on the console
+// void animateCar(int carNum) {
+//     COORD tempCord;
+
+//     if(car[carNum].x < car[carNum].endPos.X * 4) {
+//         if(((car[carNum].x/4)%2) - s1dir != 0)
+//         {
+//             updateCar(MOVE_RIGHT, carNum);
+//             debugPrint("XR");
+//         }
+//         else
+//         {
+//             updateCar(MOVE_DOWN, carNum);
+//             debugPrint("YD");
+//         }
+//     }   
+//     else if(car[carNum].x > car[carNum].endPos.X * 4) {
+//         if(((car[carNum].x/4)%2) - s1dir != 0)
+//         {
+//             updateCar(MOVE_LEFT, carNum);
+//             debugPrint("XL");
+//         }
+//         else
+//         {
+//             updateCar(MOVE_UP, carNum);
+//             debugPrint("YU");
+//         }
+//     }
+//     else if(car[carNum].y < car[carNum].endPos.Y * 4 + startOffset.Y) {
+//         if(((car[carNum].y/4)%2) - a1dir != 0)
+//         {
+//             updateCar(MOVE_DOWN, carNum);
+//             debugPrint("YD");
+//         }
+//         else
+//         {
+//             updateCar(MOVE_RIGHT, carNum);
+//             debugPrint("XR");
+//         }
+//     }
+//     else if(car[carNum].y > car[carNum].endPos.Y * 4 + startOffset.Y) {
+//         if(((car[carNum].y/4)%2) - a1dir != 0)
+//         {
+//             updateCar(MOVE_UP, carNum);
+//             debugPrint("YU");
+//         }
+//         else
+//         {
+//             updateCar(MOVE_LEFT, carNum);
+//             debugPrint("XL");
+//         }
+//     }
+//     Sleep(200);
+// }
+
+// void animateCar(int carNum)
+// {
+//     static int state, count = 0, start = 1, undershootIndX = 0, undershootIndY = 0, arrivedStat = 0;
+//     int numStepsX = car[carNum].endPos.X * 4 - car[carNum].x, numStepsY = car[carNum].endPos.Y * 4 + startOffset.Y - car[carNum].y;
+//     if(count == 0)
+//     {
+//         if((((car[carNum].x/4)%2) - s1dir) != 0 && start == 1) // has to move up/down 1 to be able to move horiz
+//         {
+//             state = 0;
+//             count = 4;
+//         }
+//         else // can move in horiz for start
+//         {
+//             state = 1;
+//             if((((car[carNum].endPos.Y/4)%2)+a1dir) != 0) // if dest col is wrong direction
+//             {
+//                 count = numStepsX;
+//                 undershootIndX = 1;
+//             }
+//             else // if dest col is right direction
+//             {
+//                 count = numStepsX - 4;
+//                 undershootIndX = 0;
+//             }
+//             start = 0;
+//         }
+//         if((((car[carNum].endPos.X/4)%2)+s1dir) != 0 && arrivedStat == 1)
+//         {
+//             state = 2;
+//             start = 0;
+//             count = numStepsY - 4;
+//             undershootIndY = 1;
+//         }
+//         else if((((car[carNum].endPos.X/4)%2)+a1dir) == 0 && arrivedStat == 1)
+//         {
+//             state = 2;
+//             start = 0;
+//             count = numStepsY;
+//             undershootIndY = 0;
+//         }
+//         else if((numStepsX-4*undershootIndX) == 0 && arrivedStat == 1)
+//         {
+//             state = 2;
+//             start = 0;
+//             count = numStepsY;
+//             undershootIndY = 0;
+//         }
+//     }
+//     //debugPrint(state, arrivedStat, (((car[carNum].endPos.X/4)%2)+s1dir));
+//     switch(state){
+//         case 0:
+//             if((((car[carNum].x/4)%2) - s1dir) != 0)
+//             {
+//                 updateCar(MOVE_DOWN, carNum);
+//                 count--;
+//             }
+//             else
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count--;
+//             }
+//             if(count == 0)
+//             {
+//                 start = 0;
+//             }
+//             break;
+//         case 1:
+//             if(numStepsX > 0)
+//             {
+//                 updateCar(MOVE_RIGHT, carNum);
+//                 count--;
+//             }
+//             else if(numStepsX < 0)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count--;
+//             }
+//             else
+//              arrivedStat = 1;
+//             break;
+//         case 2:
+//             if(numStepsY > 0)
+//             {
+//                 updateCar(MOVE_DOWN, carNum);
+//                 count--;
+//             }
+//             else if(numStepsY < 0)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count--;
+//             }
+//             break;
+//         default:
+//             break;
+//     }
+//     Sleep(200);
+// }
+
+// void animateCar(int carNum)
+// {
+//     static int complete = 0, count = 0, oneColShort = 0, state = 0; // state 1 = UP, 2 = DOWN, 3 = RIGHT, 4 = LEFT
+//     if(count <= 0)
+//     {
+//         if((car[carNum].y/4)-s1dir != (car[carNum].endPos.Y/4)-s1dir && complete == 0) // if curent dir is not point towards dest go rowDir by 4
+//         {
+//             if(car[carNum].x/4 == 1)
+//             {
+//                 state = 1;
+//                 count = 4;
+//             }
+//             else{
+//                 state = 2;
+//                 count = 4;
+//             }
+//         }
+//         else if(complete == 0) // if current dir is right go to dest column
+//         {
+//             if(car[carNum].y/4 == 1)
+//             {
+//                 state = 4;
+//             }
+//             else{
+//                 state = 3;
+//             }
+//             if((car[carNum].endPos.X/4)-s1dir != (car[carNum].x/4)-s1dir) // if dest column is wrong dir go 4 less
+//             {
+//                     oneColShort = 1;
+//                     complete = 1;
+//             }
+//             else{ // otherwise go to dest
+//                 oneColShort = 0;
+//                 complete = 6;
+//             }
+//             count = abs(car[carNum].endPos.X * 4 - car[carNum].x) - 4*oneColShort;
+//         }
+//         else if(complete == 1) 
+//         {
+//             if(car[carNum].x/4 == 1) // if dest row is wrong dir go 4 more
+//             {
+//                 state = 1;
+//                 printf("here");
+//                 count = abs(car[carNum].endPos.Y * 4 + startOffset.Y - car[carNum].y) - 4;
+//                 complete = 3;
+
+//             }
+//             else{ // if dest row is right dir go to dest row
+//                 state = 2;
+//                 printf("here2");
+//                 count = abs(car[carNum].endPos.Y + startOffset.Y - car[carNum].y);
+//                 complete = 4;
+
+//             }
+//         }
+//         else if(complete == 3) // if dest row was over shot, move over 4 in current row dir
+//         {
+//             if(car[carNum].y/4 == 1)
+//             {
+//                 state = 4;
+//                 count = 4;
+//             }
+//             else{
+//                 state = 3;
+//                 count = 4;
+//             }
+//             complete = 4;
+//         }
+//         else if(complete == 4)
+//         {
+//             if(car[carNum].x/4 == 1) // finally go by 4 in dir and reach destination
+//             {
+//                 state = 1;
+//                 count = 4;
+//                 complete = 5;
+//             }
+//             else{ 
+//                 state = 2;
+//                 count = 4;
+//                 complete = 5;
+//             }
+//         }
+//     }
+//     debugPrint(state, count, oneColShort, complete);
+//     switch(state)
+//     {
+//         case 1:
+//             updateCar(MOVE_UP, carNum);
+//             count--;
+//             break;
+//         case 2:
+//             updateCar(MOVE_DOWN, carNum);
+//             count--;
+//             break;
+//         case 3:
+//             updateCar(MOVE_RIGHT, carNum);
+//             count--;
+//             break;
+//         case 4:
+//             updateCar(MOVE_LEFT, carNum);
+//             count--;
+//             break;
+//         default:
+//             break;
+//     }
+//     Sleep(200);
+
+// }
 // Function to free allocated memory for the city grid
 void freeGrid(unsigned int ySize) {
     for (unsigned int i = 0; i < (4 * ySize + 2); i++) {
@@ -322,12 +903,13 @@ void printGrid(unsigned int xSize, unsigned int ySize) {
 
 // Function to read building data from a file and set up the city grid layout
 void read_file() {
-    struct bldg_data bd;  // Declare a building data structure
 
     // Read x and y dimensions of the building from the file
     fread(&xbldg, sizeof(int), 1, bfd);
     fread(&ybldg, sizeof(int), 1, bfd);
 
+    // 0 = East, 1 = West
+    // 0 = North, 1 = South
     fread(&s1dir, sizeof(int), 1, bfd);
     fread(&a1dir, sizeof(int), 1, bfd);
 
@@ -336,17 +918,17 @@ void read_file() {
 
     // Read building data and set up the city grid
     fread(&bd, sizeof(struct bldg_data), 1, bfd);
-    // Iterate until a building with x-coordinate greater than 0 is found
+    // Iterate while a building with x-coordinate greater than 0 is found
     COORD tempCoord;
     while (bd.x > 0) {
         // Depending on the building type, update the corresponding cell in the city grid
-        if (strcmp(bldg_t[bd.bt].name, "Charge") == 0) {  // Using strcmp since we are comparing strings
+        if (bd.bt == CHG) {  // Using strcmp since we are comparing strings
             tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'C';
-        } else if (strcmp(bldg_t[bd.bt].name, "Stable") == 0) {
+        } else if (bd.bt == STB) {
             tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'S';
-        } else if (strcmp(bldg_t[bd.bt].name, "Both") == 0) {
+        } else if (bd.bt == BOTH) {
             tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
             // printf("X: %d(%d), Y: %d(%d), QUAD: %s\n", bd.x, bd.x*4-2, bd.y, bd.y*4-2,bldg_q[bd.qd].name);
             // printf("tX: %d, tY: %d\n", tempCoord.X, tempCoord.Y);
