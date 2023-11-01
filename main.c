@@ -253,17 +253,40 @@ enum QUAD mapIntToQuad(int quadInt) {
 // }
 int getStartAndEndCoordinates() {
     int numCars;
+    char quadString[5];
     printf("How many AEDVs would you like to create?: ");
     scanf("%i", &numCars);
     COORD tempCoord[numCars];
     car = (Car*)malloc(numCars * sizeof(Car)+1);
     for(int i = 0; i < numCars; i++)
     {
-        printf("Enter the X Y coordinate for the starting point for car %i: ", i);
+        printf("Enter the X, Y coordinate for the starting point for car %i: ", i);
         scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
         int tempQuad;
-        printf("Enter the X Y Quad coordinate for the ending point for car %i: ", i);
-        scanf("%i%i%i", &car[i].endPos.X, &car[i].endPos.Y, &tempQuad);
+        printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
+        scanf("%i%i%s", &car[i].endPos.X, &car[i].endPos.Y, &quadString);
+        if(strcmp(quadString, "N") == 0)
+            tempQuad = 1;
+        else if(strcmp(quadString, "NW") == 0)
+            tempQuad = 2;
+        else if(strcmp(quadString, "W") == 0)
+            tempQuad = 3;
+        else if(strcmp(quadString, "SW") == 0)
+            tempQuad = 4;
+        else if(strcmp(quadString, "S") == 0)
+            tempQuad = 5;
+        else if(strcmp(quadString, "SE") == 0)
+            tempQuad = 6;
+        else if(strcmp(quadString, "E") == 0)
+            tempQuad = 7;
+        else if(strcmp(quadString, "NE") == 0)
+            tempQuad = 8;
+        else
+        {
+            printf("Invalid quadrant entered");
+            getchar();
+            exit(EXIT_FAILURE);
+        }
         car[i].endQuad = mapIntToQuad(tempQuad);
     }
 
@@ -465,7 +488,7 @@ void animateCar(int carNum) {
             else
                 toggleInside[carNum] = 2;
         }
-        if(car[carNum].endQuad == SW)
+        if(car[carNum].endQuad == SE)
         {
             if(toggleInside[carNum] == 0)
             {
@@ -474,38 +497,11 @@ void animateCar(int carNum) {
             }
             if(count[carNum] > 0)
             {
-                updateCar(MOVE_UP, carNum);
+                updateCar(MOVE_LEFT, carNum);
                 count[carNum]--;
             }
             else
                 toggleInside[carNum] = 2;
-        }
-        if(car[carNum].endQuad == NW)
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 1)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 1)
-                toggleInside[carNum] = 2;
-            if(toggleInside[carNum] == 2)
-            {
-                count[carNum] = 2;
-                toggleInside[carNum] = 3;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 3)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 3)
-                toggleInside[carNum] = 4;
         }
         if(car[carNum].endQuad == NE)
         {
@@ -574,20 +570,6 @@ void animateCar(int carNum) {
                 updateCar(MOVE_UP, carNum);
                 count[carNum]--;
             }
-            else if(toggleInside[carNum] == 1)
-                toggleInside[carNum] = 2;
-            if(toggleInside[carNum] == 2)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 3;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 3)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 3)
-                toggleInside[carNum] = 4;
         }
         if(car[carNum].endQuad == E)
         {
@@ -605,7 +587,7 @@ void animateCar(int carNum) {
                 toggleInside[carNum] = 2;
             if(toggleInside[carNum] == 2)
             {
-                count[carNum] = 3;
+                count[carNum] = 2;
                 toggleInside[carNum] = 3;
             }
             if(count[carNum] > 0 && toggleInside[carNum] == 3)
