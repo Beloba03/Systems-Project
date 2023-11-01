@@ -272,7 +272,7 @@ int getStartAndEndCoordinates() {
     startOffset = getCursorPosition();
     for(int i = 0; i < numCars; i++)
     {
-        car[i].x = tempCoord[i].X * 4 + startOffset.X-2;
+        car[i].x = tempCoord[i].X * 4 + startOffset.X;
         car[i].y = tempCoord[i].Y * 4 + startOffset.Y;
 
         car[i].endPos.X = 4*car[i].endPos.X;
@@ -395,226 +395,226 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 }
 void animateCar(int carNum) {
     COORD tempCord;
-    static int toggle = 0, count, toggleInside = 0;
+    static int toggle[4] = {0}, count[4], toggleInside[4] = {0};
     if(car[carNum].x < car[carNum].endPos.X && toggle == 0) {
         updateCar(MOVE_RIGHT, carNum);
-        toggleInside = 0;
+        toggleInside[carNum] = 0;
         //debugPrint("XR");
     }   
     else if(car[carNum].x > car[carNum].endPos.X && toggle == 0) {
         updateCar(MOVE_LEFT, carNum);
-        toggleInside = 0;
+        toggleInside[carNum] = 0;
         //debugPrint("XL");
     }
     else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
         updateCar(MOVE_DOWN, carNum);
-        toggleInside = 0;
+        toggleInside[carNum] = 0;
         //debugPrint("YD");
     }
     else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
         updateCar(MOVE_UP, carNum);
-        toggleInside = 0;
+        toggleInside[carNum] = 0;
         ///debugPrint("YU");
     }
     else{
-        toggle = 1;
+        toggle[carNum] = 1;
         if(car[carNum].endQuad == S)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 2;
-                toggleInside = 1;
+                count[carNum] = 2;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0)
+            if(count[carNum] > 0)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
             else
-                toggleInside = 2;
+                toggleInside[carNum] = 2;
             
             
         }
         if(car[carNum].endQuad == SW)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 1;
-                toggleInside = 1;
+                count[carNum] = 1;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0)
+            if(count[carNum] > 0)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
             else
-                toggleInside = 2;
+                toggleInside[carNum] = 2;
         }
         if(car[carNum].endQuad == W)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 2;
-                toggleInside = 1;
+                count[carNum] = 2;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0)
+            if(count[carNum] > 0)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
             else
-                toggleInside = 2;
+                toggleInside[carNum] = 2;
         }
         if(car[carNum].endQuad == SW)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 3;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0)
+            if(count[carNum] > 0)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
             else
-                toggleInside = 2;
+                toggleInside[carNum] = 2;
         }
         if(car[carNum].endQuad == NW)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 3;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0 && toggleInside == 1)
+            if(count[carNum] > 0 && toggleInside[carNum] == 1)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 1)
-                toggleInside = 2;
-            if(toggleInside == 2)
+            else if(toggleInside[carNum] == 1)
+                toggleInside[carNum] = 2;
+            if(toggleInside[carNum] == 2)
             {
-                count = 2;
-                toggleInside = 3;
+                count[carNum] = 2;
+                toggleInside[carNum] = 3;
             }
-            if(count > 0 && toggleInside == 3)
+            if(count[carNum] > 0 && toggleInside[carNum] == 3)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 3)
-                toggleInside = 4;
+            else if(toggleInside[carNum] == 3)
+                toggleInside[carNum] = 4;
         }
-            if(car[carNum].endQuad == NE)
+        if(car[carNum].endQuad == NE)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 3;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0 && toggleInside == 1)
+            if(count[carNum] > 0 && toggleInside[carNum] == 1)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 1)
-                toggleInside = 2;
-            if(toggleInside == 2)
+            else if(toggleInside[carNum] == 1)
+                toggleInside[carNum] = 2;
+            if(toggleInside[carNum] == 2)
             {
-                count = 4;
-                toggleInside = 3;
+                count[carNum] = 4;
+                toggleInside[carNum] = 3;
             }
-            if(count > 0 && toggleInside == 3)
+            if(count[carNum] > 0 && toggleInside[carNum] == 3)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 3)
-                toggleInside = 4;
+            else if(toggleInside[carNum] == 3)
+                toggleInside[carNum] = 4;
             
         }
         if(car[carNum].endQuad == N)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 3;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0 && toggleInside == 1)
+            if(count[carNum] > 0 && toggleInside[carNum] == 1)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 1)
-                toggleInside = 2;
-            if(toggleInside == 2)
+            else if(toggleInside[carNum] == 1)
+                toggleInside[carNum] = 2;
+            if(toggleInside[carNum] == 2)
             {
-                count = 3;
-                toggleInside = 3;
+                count[carNum] = 3;
+                toggleInside[carNum] = 3;
             }
-            if(count > 0 && toggleInside == 3)
+            if(count[carNum] > 0 && toggleInside[carNum] == 3)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 3)
-                toggleInside = 4;
+            else if(toggleInside[carNum] == 3)
+                toggleInside[carNum] = 4;
         }
         if(car[carNum].endQuad == NW)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 3;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0 && toggleInside == 1)
+            if(count[carNum] > 0 && toggleInside[carNum] == 1)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 1)
-                toggleInside = 2;
-            if(toggleInside == 2)
+            else if(toggleInside[carNum] == 1)
+                toggleInside[carNum] = 2;
+            if(toggleInside[carNum] == 2)
             {
-                count = 3;
-                toggleInside = 3;
+                count[carNum] = 3;
+                toggleInside[carNum] = 3;
             }
-            if(count > 0 && toggleInside == 3)
+            if(count[carNum] > 0 && toggleInside[carNum] == 3)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 3)
-                toggleInside = 4;
+            else if(toggleInside[carNum] == 3)
+                toggleInside[carNum] = 4;
         }
-        if(car[carNum].endQuad == W)
+        if(car[carNum].endQuad == E)
         {
-            if(toggleInside == 0)
+            if(toggleInside[carNum] == 0)
             {
-                count = 3;
-                toggleInside = 1;
+                count[carNum] = 4;
+                toggleInside[carNum] = 1;
             }
-            if(count > 0 && toggleInside == 1)
+            if(count[carNum] > 0 && toggleInside[carNum] == 1)
             {
                 updateCar(MOVE_LEFT, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 1)
-                toggleInside = 2;
-            if(toggleInside == 2)
+            else if(toggleInside[carNum] == 1)
+                toggleInside[carNum] = 2;
+            if(toggleInside[carNum] == 2)
             {
-                count = 3;
-                toggleInside = 3;
+                count[carNum] = 3;
+                toggleInside[carNum] = 3;
             }
-            if(count > 0 && toggleInside == 3)
+            if(count[carNum] > 0 && toggleInside[carNum] == 3)
             {
                 updateCar(MOVE_UP, carNum);
-                count--;
+                count[carNum]--;
             }
-            else if(toggleInside == 3)
-                toggleInside = 4;
+            else if(toggleInside[carNum] == 3)
+                toggleInside[carNum] = 4;
         }
     }
     Sleep(200);
