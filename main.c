@@ -7,7 +7,7 @@
 char** cityGrid;
 
 // Variables to store x and y dimensions of a building
-unsigned int xbldg, ybldg, s1dir, a1dir;
+unsigned int xbldg, ybldg, s1dir, a1dir, trigger = 0;
 
 // Define a structure named Car to hold the x and y position of a car in the city grid
 typedef struct {
@@ -307,17 +307,42 @@ int getStartAndEndCoordinates() {
 
 
 void updateEndCoordinates() {
-    COORD carPos = getCursorPosition();
-    int carNum;
+    int numCar;
+    COORD tempCord = getCursorPosition();
     setCursorPosition(0, 4*ybldg+8);
-    printf("Enter the car number you would like to update: ");
-    scanf("%d", &carNum);
-    printf("Enter the X Y coordinate for the ending point for car %i: ", carNum);
-    scanf("%d", &car[carNum].endPos.X);
-    scanf("%d", &car[carNum].endPos.Y);
-
-    getchar(); // Clear any remaining newline characters from the input buffer
-    setCursorPosition(carPos.X, carPos.Y);
+    printf("Enter the car num you would like to change: ");
+    scanf("%i", &numCar);
+    int tempQuad;
+    char quadString[4];
+    printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", numCar);
+    scanf("%i%i%s", &car[numCar].endPos.X, &car[numCar].endPos.Y, &quadString);
+    if(strcmp(quadString, "N") == 0)
+        tempQuad = 1;
+    else if(strcmp(quadString, "NW") == 0)
+        tempQuad = 2;
+    else if(strcmp(quadString, "W") == 0)
+        tempQuad = 3;
+    else if(strcmp(quadString, "SW") == 0)
+        tempQuad = 4;
+    else if(strcmp(quadString, "S") == 0)
+        tempQuad = 5;
+    else if(strcmp(quadString, "SE") == 0)
+        tempQuad = 6;
+    else if(strcmp(quadString, "E") == 0)
+        tempQuad = 7;
+    else if(strcmp(quadString, "NE") == 0)
+        tempQuad = 8;
+    else
+    {
+        printf("Invalid quadrant entered");
+        getchar();
+        exit(EXIT_FAILURE);
+    }
+    car[numCar].endQuad = mapIntToQuad(tempQuad);
+    car[numCar].endPos.X = 4*car[numCar].endPos.X;
+    car[numCar].endPos.Y = 4*car[numCar].endPos.Y;
+    setCursorPosition(tempCord.X, tempCord.Y);
+    trigger = numCar+1;
 }
 
 // Function to update car's position on the console
@@ -419,6 +444,14 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 void animateCar(int carNum) {
     COORD tempCord;
     static int toggle[4] = {0, 0 ,0, 0}, count[4], toggleInside[4] = {0, 0 ,0, 0};
+
+    if(trigger != 0)
+    {
+        toggle[trigger-1] = 0;
+        count[trigger-1] = 0;
+        toggleInside[trigger-1] = 0;
+        trigger = 0;
+    }
     if(car[carNum].x < car[carNum].endPos.X && toggle[carNum] == 0) {
         updateCar(MOVE_RIGHT, carNum);
         toggleInside[carNum] = 0;
