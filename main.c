@@ -39,6 +39,19 @@ void hideCursor() {
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
 
+void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow) {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Set buffer size
+    COORD bufferSize = {xBuffer, yBuffer};
+    SetConsoleScreenBufferSize(hConsole, bufferSize);
+
+    // Set window size
+    SMALL_RECT windowSize = {0, 0, xWindow - 1, yWindow - 1}; // -1 because coordinates are zero-based
+    SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
+}
+
+
 COORD getCursorPosition() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;
@@ -374,6 +387,7 @@ int main(int argc, char *argv[]) {
     int numCars;
     numCars = getStartAndEndCoordinates();
     hideCursor();
+    setConsoleBufferSizeAndWindow(300, 300, 80, 50); // 80 columns wide, 200 rows buffer, 50 rows visible in window
     // Read the file and set up the city grid layout
     read_file();
     // Animate the car's movement on the console
