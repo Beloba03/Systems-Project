@@ -395,23 +395,23 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 }
 void animateCar(int carNum) {
     COORD tempCord;
-    static int toggle[4] = {0}, count[4], toggleInside[4] = {0};
-    if(car[carNum].x < car[carNum].endPos.X && toggle == 0) {
+    static int toggle[4] = {0, 0 ,0, 0}, count[4], toggleInside[4] = {0, 0 ,0, 0};
+    if(car[carNum].x < car[carNum].endPos.X && toggle[carNum] == 0) {
         updateCar(MOVE_RIGHT, carNum);
         toggleInside[carNum] = 0;
         //debugPrint("XR");
     }   
-    else if(car[carNum].x > car[carNum].endPos.X && toggle == 0) {
+    else if(car[carNum].x > car[carNum].endPos.X && toggle[carNum] == 0) {
         updateCar(MOVE_LEFT, carNum);
         toggleInside[carNum] = 0;
         //debugPrint("XL");
     }
-    else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
+    else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
         updateCar(MOVE_DOWN, carNum);
         toggleInside[carNum] = 0;
         //debugPrint("YD");
     }
-    else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle == 0) {
+    else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
         updateCar(MOVE_UP, carNum);
         toggleInside[carNum] = 0;
         ///debugPrint("YU");
