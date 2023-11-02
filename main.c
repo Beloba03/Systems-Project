@@ -1,6 +1,6 @@
 // Include the building generator header
 #include "BldgGen.h"
-// Include the Windows API header (to handle Windows-specific functionalities)
+// Include the Windows API header
 #include <windows.h>
 
 // Declaration of a 2D character array for city grid layout
@@ -40,42 +40,42 @@ void hideCursor() {
 
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
-COORD convertBuildingCoordToStreet(COORD tempCoord, enum QUAD location)
-{
-    switch(location) {
-        case NE:
-            tempCoord.X -= 1;
-            tempCoord.Y -= 2;
-            break;
-        case N:
-            tempCoord.Y -= 2;
-            break;
-        case NW:
-            tempCoord.X += 1;
-            tempCoord.Y -= 2;
-            break;
-        case W:
-            tempCoord.X += 2;
-            break;
-        case SW:
-            tempCoord.X += 1;
-            tempCoord.Y += 2;
-            break;
-        case S:
-            tempCoord.Y += 2;
-            break;
-        case SE:
-            tempCoord.X -= 1;
-            tempCoord.Y += 2;
-            break;
-        case E:
-            tempCoord.X -= 1;
-            break;
-        default:
-            break;
-    }
-    return tempCoord;
-}
+// COORD convertBuildingCoordToStreet(COORD tempCoord, enum QUAD location)
+// {
+//     switch(location) {
+//         case NE:
+//             tempCoord.X -= 1;
+//             tempCoord.Y -= 2;
+//             break;
+//         case N:
+//             tempCoord.Y -= 2;
+//             break;
+//         case NW:
+//             tempCoord.X += 1;
+//             tempCoord.Y -= 2;
+//             break;
+//         case W:
+//             tempCoord.X += 2;
+//             break;
+//         case SW:
+//             tempCoord.X += 1;
+//             tempCoord.Y += 2;
+//             break;
+//         case S:
+//             tempCoord.Y += 2;
+//             break;
+//         case SE:
+//             tempCoord.X -= 1;
+//             tempCoord.Y += 2;
+//             break;
+//         case E:
+//             tempCoord.X -= 1;
+//             break;
+//         default:
+//             break;
+//     }
+//     return tempCoord;
+// }
 void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -472,6 +472,7 @@ void animateCar(int carNum) {
         toggleInside[carNum] = 0;
         ///debugPrint("YU");
     }
+    // This occurs when the vehicle has reached the dest intersection. It excecutes a move to the correct quadrent
     else{
         toggle[carNum] = 1;
         if(car[carNum].endQuad == S)
