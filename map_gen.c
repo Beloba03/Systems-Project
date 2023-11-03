@@ -1,3 +1,10 @@
+/*
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+November 3, 2023
+
+This module contains functions relating to reading and creating the map
+*/
+
 #include "BldgGen.h"
 
 // Declaration of a 2D character array for city grid layout
@@ -7,6 +14,7 @@ unsigned int xbldg, ybldg, s1dir, a1dir;
 int numCars;
 struct bldg_data bd;  // Declare a building data structure
 
+// This converts the quadrant to a string
 char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
     switch (type) {
         case CHG:
@@ -22,23 +30,26 @@ char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
 
 // Function to initialize the city grid
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
-    cityGrid = (char**)malloc((4 * ySize + 6) * sizeof(char*));
-    if(cityGrid == NULL)
+    cityGrid = (char**)malloc((4 * ySize + 6) * sizeof(char*)); // Allocate memory for the city grid (y)
+    if(cityGrid == NULL) // Check if memory allocation was successful
     {
         printf("Failed to allocate memory for cityGrid");
         getchar();
         exit(EXIT_FAILURE);
     }
-    int skipVer = 1, skipHor;
+    int skipVer = 1, skipHor; // Variables to track which cells to skip (the streets)
+
+    // Iterate through the city grid and set the appropriate cells to the appropriate characters
     for (unsigned int i = 0; i < 4 * ySize + 2; i++) {
         skipHor = 1;
-        cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char));
+        cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char)); // Allocate memory for the city grid (x)
         if(cityGrid[i] == NULL)
         {
             printf("Failed to allocate memory for cityGrid[%d]", i);
             getchar();
             exit(EXIT_FAILURE);
         }
+        // Iterate through each line of the city grid
         for (unsigned int j = 0; j < 4 * xSize + 2; j++) {
             if (i % 4 == 0 || j % 4 == 0) {
                 cityGrid[i][j] = ' ';
@@ -63,6 +74,7 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
     }
 }
 
+// Prints the city grid to the console
 void printGrid(unsigned int xSize, unsigned int ySize) {
     setCursorPosition(startOffset.X, startOffset.Y);
     for (unsigned int y = 0; y < (ySize * 4) + 1; y++) {
@@ -73,6 +85,7 @@ void printGrid(unsigned int xSize, unsigned int ySize) {
     }
 }
 
+// Function to convert from the centre of the building to each cardinal direction
 COORD convertBuildingCoord(int x, int y, enum QUAD location)
 {
     COORD tempCord = {x, y};
@@ -133,13 +146,13 @@ void read_file() {
     while (bd.x > 0) {
         // Depending on the building type, update the corresponding cell in the city grid
         if (bd.bt == CHG) {
-            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            tempCoord = convertBuildingCoord(bd.x*SCALE_FACTOR-BUILDING_OFFSET, bd.y*SCALE_FACTOR-BUILDING_OFFSET, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'C';
         } else if (bd.bt == STB) {
-            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            tempCoord = convertBuildingCoord(bd.x*SCALE_FACTOR-BUILDING_OFFSET, bd.y*SCALE_FACTOR-BUILDING_OFFSET, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'S';
         } else if (bd.bt == BOTH) {
-            tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
+            tempCoord = convertBuildingCoord(bd.x*SCALE_FACTOR-BUILDING_OFFSET, bd.y*SCALE_FACTOR-BUILDING_OFFSET, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'B';
         }
 

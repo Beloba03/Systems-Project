@@ -1,3 +1,11 @@
+/*
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+November 3, 2023
+
+This is the main module for the AEDV program. It contains the main function which controls
+and calls all of the other functions
+*/
+
 // Include the building generator header.
 #include "BldgGen.h"
 
@@ -24,7 +32,7 @@ int main(int argc, char *argv[]) {
     
     // Prepare the console for the animation.
     hideCursor();
-    setConsoleBufferSizeAndWindow(300, 300, 80, 50); // Set buffer and window sizes.
+    setConsoleBufferSizeAndWindow(600, 600, 80, 80); // Set buffer and window sizes.
 
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
@@ -46,7 +54,7 @@ int main(int argc, char *argv[]) {
         }
     }
     // Set the cursor position to the bottom of the grid.
-    setCursorPosition(0, 4*ybldg+7);
+    setCursorPosition(0, SCALE_FACTOR*ybldg+7);
     printf("\nDone\n");  // Inform the user that the animation is complete.
 
     (void) getchar();    // Wait for a character input before exiting.

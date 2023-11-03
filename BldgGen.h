@@ -1,20 +1,20 @@
-#pragma once
-// A portion of this code was used from the brightspace example code for building reading. 
-/* 
-    BldgGen.h - Header file for the Building Generator software
 
-    Description:
-    - Basic building file structure:
-        #x #y - int int - buildings in row
-        1Str 1Ave - int int - (EW 01) and (NS 01)
-        1 { #S #A Type Quad - Bldg XY + [Chg|Stab|Both] + [NE..SW] } Many
-        0 0 
-    - Used by write and read modules
+/*
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+November 3, 2023
 
-    Course: ECED 3401
-    Date: 25 Oct 2023
+A the file reading portion of this code was used from the brightspace example code for building reading. 
+It was written by Dr. Hughes. 
+
+This is the header file for the AEDV program. It contains the function declarations, structure definitions, and global variables.
+
+Building file structure:
+	#x #y - int int - buildings in row
+	1Str 1Ave - int int - (EW 01) and (NS 01)
+	1 { #S #A Type Quad - Bldg XY + [Chg|Stab|Both] + [NE..SW] } Many
+	0 0 - int int - end of file
 */
-
+#pragma once
 #define _CRT_SECURE_NO_WARNINGS
 
 // Header files
@@ -26,6 +26,19 @@
 
 #define TRUNCATE(name)	name[strlen(name)-1] = '\0'  // Macro to truncate last character of a string
 #define NAMELEN	16	/* Maximum length for filename */
+#define SCALE_FACTOR 4
+#define N_NUM 1
+#define NW_NUM 2
+#define W_NUM 3
+#define SW_NUM 4
+#define S_NUM 5
+#define SE_NUM 6
+#define E_NUM 7
+#define NE_NUM 8
+#define MAX_QUAD_LENGTH 4
+#define MAX_CAR_NUM 4
+#define UPDATE_INPUT_OFFSET 5
+#define BUILDING_OFFSET 2
 
 // Enumerations for defining directions and building types
 enum ST_DIR { East, West };
@@ -75,7 +88,7 @@ extern unsigned int xbldg;
 extern Car *car;
 extern int numCars;
 
-// File descriptor for the building file
+// File pointer for the building data file
 FILE* bfd;
 
 // Function declarations

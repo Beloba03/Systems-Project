@@ -1,3 +1,10 @@
+/*
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+November 3, 2023
+
+This module contains functions relating to using the windows API to initialize the console window
+*/
+
 #include "BldgGen.h"
 
 // Function to hide the console's cursor
