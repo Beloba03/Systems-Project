@@ -13,6 +13,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -44,13 +45,40 @@ char* name;
 int code;
 };
 
-struct prompt bldg_t[] = { {"Charge",CHG}, {"Stable",STB}, {"Both", BOTH} };
-struct prompt ew[] = { {"East", East}, {"West", West} };
-struct prompt ns[] = { {"North", North}, {"South", South} };
-struct prompt bldg_q[] = {
-	{"NE",NE}, {"N",N}, {"NW",NW},
-	{"E",E}, {"LBL",-1}, {"W",W},
-	{"SE",SE}, {"S",S}, {"SW",SW} };
+typedef enum {
+    MOVE_UP,
+    MOVE_RIGHT,
+    MOVE_DOWN,
+    MOVE_LEFT
+} CarDirection;
+
+// Define a structure named Car to hold the x and y position of a car in the city grid
+typedef struct {
+    unsigned int x;  // x-position of the car
+    unsigned int y;  // y-position of the car
+    COORD endPos;
+    enum QUAD endQuad;
+} Car;
+
+extern struct prompt bldg_t[];
+extern struct prompt ew[];
+extern struct prompt ns[];
+extern struct prompt bldg_q[];
+extern char** cityGrid;
+extern COORD startOffset;
+extern unsigned int ybldg;
+extern Car *car;
 
 /* Building file descriptor */
 FILE* bfd;
+
+
+extern void hideCursor();
+void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow);
+extern COORD getCursorPosition();
+void setCursorPosition(int x, int y);
+extern void read_file();
+extern int getStartAndEndCoordinates();
+extern void updateEndCoordinates();
+extern void animateCar(int carNum);
+extern void freeGrid(unsigned int ySize);
