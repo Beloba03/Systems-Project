@@ -1,4 +1,6 @@
 #include "BldgGen.h"
+
+// Function to hide the console's cursor
 void hideCursor() {
     HANDLE hConsoleOutput;
     CONSOLE_CURSOR_INFO cursorInfo;
@@ -11,6 +13,7 @@ void hideCursor() {
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
 
+// Function to set the console's buffer and window sizes to allow for maps larger than the screen
 void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -23,7 +26,7 @@ void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, 
     SetConsoleWindowInfo(hConsole, TRUE, &windowSize);
 }
 
-
+// Function to get the console's cursor position
 COORD getCursorPosition() {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO csbi;

@@ -132,7 +132,7 @@ void read_file() {
     COORD tempCoord;
     while (bd.x > 0) {
         // Depending on the building type, update the corresponding cell in the city grid
-        if (bd.bt == CHG) {  // Using strcmp since we are comparing strings
+        if (bd.bt == CHG) {
             tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
             cityGrid[tempCoord.Y][tempCoord.X] = 'C';
         } else if (bd.bt == STB) {
@@ -140,14 +140,8 @@ void read_file() {
             cityGrid[tempCoord.Y][tempCoord.X] = 'S';
         } else if (bd.bt == BOTH) {
             tempCoord = convertBuildingCoord(bd.x*4-2, bd.y*4-2, bd.qd);
-            // printf("X: %d(%d), Y: %d(%d), QUAD: %s\n", bd.x, bd.x*4-2, bd.y, bd.y*4-2,bldg_q[bd.qd].name);
-            // printf("tX: %d, tY: %d\n", tempCoord.X, tempCoord.Y);
             cityGrid[tempCoord.Y][tempCoord.X] = 'B';
         }
-        
-        // Print building details on the console
-        //printf("Bldg XY: %d %d Type: %s Quad: %s\n", bd.x, bd.y, 
-         //   bldg_t[bd.bt].name, bldg_q[bd.qd].name);
 
         // Read the next building data
         fread(&bd, sizeof(struct bldg_data), 1, bfd);
@@ -160,7 +154,7 @@ void read_file() {
     
 }
 
-// Function to free allocated memory for the city grid
+// Function to free allocated memory for the city grid and cars
 void freeGrid(unsigned int ySize) {
     for (unsigned int i = 0; i < (4 * ySize + 2); i++) {
         free(cityGrid[i]);

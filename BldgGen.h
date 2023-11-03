@@ -17,7 +17,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-// Essential includes for functionality
+// Header files
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
