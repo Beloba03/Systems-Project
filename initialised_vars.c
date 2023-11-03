@@ -1,5 +1,6 @@
 #include "BldgGen.h"
 
+// These are the variables used to map enumeration values to strings
 struct prompt bldg_t[] = { {"Charge",CHG}, {"Stable",STB}, {"Both", BOTH} };
 struct prompt ew[] = { {"East", East}, {"West", West} };
 struct prompt ns[] = { {"North", North}, {"South", South} };

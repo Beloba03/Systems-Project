@@ -44,7 +44,7 @@ struct bldg_data {
 // Structure to hold valid responses and associated codes
 struct prompt {
     char* name;   // Name or response string
-    int code;     // Associated code
+    int code;     // Associated enumeration value
 };
 
 // Enumeration to define possible car directions
