@@ -40,6 +40,7 @@ enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
         return NE;
     else
     {
+        while((getchar()) != '\n'); // Clear the input buffer
         printf("Invalid quadrant entered");
         getchar();
         exit(EXIT_FAILURE);
