@@ -4,6 +4,7 @@
 char** cityGrid;
 COORD startOffset;
 unsigned int xbldg, ybldg, s1dir, a1dir;
+int numCars;
 struct bldg_data bd;  // Declare a building data structure
 
 char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
@@ -116,7 +117,7 @@ void read_file() {
     // Read x and y dimensions of the building from the file
     fread(&xbldg, sizeof(int), 1, bfd);
     fread(&ybldg, sizeof(int), 1, bfd);
-
+    numCars = getStartAndEndCoordinates();
     // 0 = East, 1 = West
     // 0 = North, 1 = South
     fread(&s1dir, sizeof(int), 1, bfd);

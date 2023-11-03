@@ -16,12 +16,10 @@ int main(int argc, char *argv[]) {
         getchar();  // Wait for a character input before exiting
         return 1;  // Return an error code
     }
-    int numCars;
-    numCars = getStartAndEndCoordinates();
-    hideCursor();
-    setConsoleBufferSizeAndWindow(300, 300, 80, 50); // 80 columns wide, 200 rows buffer, 50 rows visible in window
     // Read the file and set up the city grid layout
     read_file();
+    hideCursor();
+    setConsoleBufferSizeAndWindow(300, 300, 80, 50); // 80 columns wide, 200 rows buffer, 50 rows visible in window
     // Animate the car's movement on the console
     int destStatus = 0, wasDKeyPressed = 0;
     while (1) {

@@ -67,7 +67,9 @@ extern struct prompt bldg_q[];
 extern char** cityGrid;
 extern COORD startOffset;
 extern unsigned int ybldg;
+extern unsigned int xbldg;
 extern Car *car;
+extern int numCars;
 
 /* Building file descriptor */
 FILE* bfd;

@@ -58,9 +58,21 @@ int getStartAndEndCoordinates() {
     {
         printf("Enter the X, Y coordinate for the starting point for car %i: ", i);
         scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
+        if(tempCoord[i].X > xbldg || tempCoord[i].Y > ybldg)
+        {
+            printf("Invalid coordinate entered, defaulting to max\n");
+            tempCoord[i].X = xbldg;
+            tempCoord[i].Y = ybldg;
+        }
         int tempQuad;
         printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
         scanf("%i%i%s", &car[i].endPos.X, &car[i].endPos.Y, &quadString);
+        if(car[i].endPos.X > xbldg || car[i].endPos.Y > ybldg)
+        {
+            printf("Invalid coordinate entered, defaulting to max\n");
+            car[i].endPos.X = xbldg;
+            car[i].endPos.Y = ybldg;
+        }
         if(strcmp(quadString, "N") == 0)
             tempQuad = 1;
         else if(strcmp(quadString, "NW") == 0)
