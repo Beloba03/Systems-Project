@@ -1,6 +1,6 @@
 
 /*
-Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
 November 3, 2023
 
 A the file reading portion of this code was used from the brightspace example code for building reading. 
@@ -37,7 +37,7 @@ Building file structure:
 #define NE_NUM 8
 #define MAX_QUAD_LENGTH 4
 #define MAX_CAR_NUM 4
-#define UPDATE_INPUT_OFFSET 5
+#define UPDATE_INPUT_OFFSET 7
 #define BUILDING_OFFSET 2
 
 // Enumerations for defining directions and building types

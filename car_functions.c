@@ -1,5 +1,5 @@
 /*
-Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
 November 3, 2023
 
 This module contains functions relating to the car's initialization ,movement, and animation.
@@ -104,7 +104,9 @@ int getStartAndEndCoordinates() {
 
     // clear the input buffer
     while((getchar()) != '\n');
+
     startOffset = getCursorPosition();
+
     for(int i = 0; i < numCars; i++)
     {
         car[i].x = tempCoord[i].X * SCALE_FACTOR + startOffset.X;

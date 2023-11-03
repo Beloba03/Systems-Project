@@ -1,5 +1,5 @@
 /*
-Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
 November 3, 2023
 
 This is the main module for the AEDV program. It contains the main function which controls
