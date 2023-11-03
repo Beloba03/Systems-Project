@@ -77,13 +77,26 @@ int getStartAndEndCoordinates() {
             tempCoord[i].X = xbldg;
             tempCoord[i].Y = ybldg;
         }
+        if(tempCoord[i].X  < 0 && tempCoord[i].Y < 0) // Check if the user entered a valid coordinate (too low)
+        {
+            printf("Invalid coordinate entered, defaulting to min\n");
+            tempCoord[i].X = 1;
+            tempCoord[i].Y = 1;
+        }
         printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
         scanf("%i%i%s", &car[i].endPos.X, &car[i].endPos.Y, &quadString);
-        if(car[i].endPos.X > xbldg || car[i].endPos.Y > ybldg) // Check if the user entered a valid coordinate
+        if(car[i].endPos.X > xbldg || car[i].endPos.Y > ybldg) // Check if the user entered a valid coordinate (too high)
         {
-            printf("Invalid coordinate entered, defaulting to max\n");
+            printf("Invalid coordinate entered, defaulting to max\n"); 
             car[i].endPos.X = xbldg;
             car[i].endPos.Y = ybldg;
+        }
+
+        if(car[i].endPos.X  < 1 && car[i].endPos.Y < 1) // Check if the user entered a valid coordinate (too low)
+        {
+            printf("Invalid coordinate entered, defaulting to min\n");
+            car[i].endPos.X = 1;
+            car[i].endPos.Y = 1;
         }
         
         car[i].endQuad = mapInputToQuad(quadString);
@@ -115,11 +128,17 @@ void updateEndCoordinates() {
     printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", numCar);    
     scanf("%i%i%s", &car[numCar].endPos.X, &car[numCar].endPos.Y, &quadString);
     setCursorPosition(0, SCALE_FACTOR*ybldg+UPDATE_INPUT_OFFSET);
-    if(car[numCar].endPos.X > xbldg || car[numCar].endPos.Y > ybldg) // Check if the user entered a valid coordinate
+    if(car[numCar].endPos.X > xbldg || car[numCar].endPos.Y > ybldg) // Check if the user entered a valid coordinate (too high)
         {
             printf("Invalid coordinate entered, defaulting to max                                      \n");
             car[numCar].endPos.X = xbldg;
             car[numCar].endPos.Y = ybldg;
+        }
+    if(car[numCar].endPos.X  < 1 && car[numCar].endPos.Y < 1) // Check if the user entered a valid coordinate (too low)
+        {
+            printf("Invalid coordinate entered, defaulting to min                                      \n");
+            car[numCar].endPos.X = 1;
+            car[numCar].endPos.Y = 1;
         }
     printf("                                                                                         \
     \n                                                                                  "); // Clear the lines
