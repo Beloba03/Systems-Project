@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
-    while (1) {
+    while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
         // Check if the 'D' key is pressed.
         int isDKeyPressed = GetAsyncKeyState('D') & 0x8000;
 
@@ -44,10 +44,8 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < numCars; i++) {
             animateCar(i);
         }
-
-        // Introduce a delay to make the animation smoother.
-        Sleep(50);  
     }
+
 
     // Set the cursor position to the bottom of the grid.
     setCursorPosition(0, 4*ybldg+7);
