@@ -1,5 +1,5 @@
 #pragma once
-
+// A portion of this code was used from the brightspace example code for building reading. 
 /* 
     BldgGen.h - Header file for the Building Generator software
 

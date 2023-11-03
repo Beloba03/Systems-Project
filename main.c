@@ -45,8 +45,6 @@ int main(int argc, char *argv[]) {
             animateCar(i);
         }
     }
-
-
     // Set the cursor position to the bottom of the grid.
     setCursorPosition(0, 4*ybldg+7);
     printf("\nDone\n");  // Inform the user that the animation is complete.
