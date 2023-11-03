@@ -1,50 +1,53 @@
 #pragma once
-/*
- - Header file for Building Generator s/w
- - Basic building file structure:
-	#x #y - int int - buildings in row
-	1Str 1Ave - int int - (EW 01) and (NS 01)
-	1 { #S #A Type Quad - Bldg XY + [Chg|Stab|Both] + [NE..SW] } Many
-	0 0 
- - Used by write and read modules
- - ECED 3401
- - 25 Oct 2023
+
+/* 
+    BldgGen.h - Header file for the Building Generator software
+
+    Description:
+    - Basic building file structure:
+        #x #y - int int - buildings in row
+        1Str 1Ave - int int - (EW 01) and (NS 01)
+        1 { #S #A Type Quad - Bldg XY + [Chg|Stab|Both] + [NE..SW] } Many
+        0 0 
+    - Used by write and read modules
+
+    Course: ECED 3401
+    Date: 25 Oct 2023
 */
 
 #define _CRT_SECURE_NO_WARNINGS
 
+// Essential includes for functionality
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
-//#include <fcntl.h>     /* for _O_TEXT and _O_BINARY */
 
-#define TRUNCATE(name)	name[strlen(name)-1] = '\0'
-#define NAMELEN	16	/* Filename length */
+#define TRUNCATE(name)	name[strlen(name)-1] = '\0'  // Macro to truncate last character of a string
+#define NAMELEN	16	/* Maximum length for filename */
 
-/* Internal codes */
+// Enumerations for defining directions and building types
 enum ST_DIR { East, West };
 enum AV_DIR { North, South };
 enum BLDG_TYPE { CHG, STB, BOTH};
 enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
 
-/* Building record structure */
-struct bldg_data
-{
-	int x;
-	int y;
-	enum BLDG_TYPE bt;
-	enum QUAD qd;
+// Structure to define a building's properties
+struct bldg_data {
+	int x;          // X-coordinate
+	int y;          // Y-coordinate
+	enum BLDG_TYPE bt;  // Building type: Charge, Stabilize, or Both
+	enum QUAD qd;       // Building's quadrant
 };
 
-/* List of valid responses and codes */
-struct prompt
-{
-char* name;
-int code;
+// Structure to hold valid responses and associated codes
+struct prompt {
+    char* name;   // Name or response string
+    int code;     // Associated code
 };
 
+// Enumeration to define possible car directions
 typedef enum {
     MOVE_UP,
     MOVE_RIGHT,
@@ -52,14 +55,15 @@ typedef enum {
     MOVE_LEFT
 } CarDirection;
 
-// Define a structure named Car to hold the x and y position of a car in the city grid
+// Structure to define properties of a car in the city grid
 typedef struct {
-    unsigned int x;  // x-position of the car
-    unsigned int y;  // y-position of the car
-    COORD endPos;
-    enum QUAD endQuad;
+    unsigned int x;     // x-position
+    unsigned int y;     // y-position
+    COORD endPos;       // Ending position
+    enum QUAD endQuad;  // Ending quadrant
 } Car;
 
+// External declarations
 extern struct prompt bldg_t[];
 extern struct prompt ew[];
 extern struct prompt ns[];
@@ -71,10 +75,10 @@ extern unsigned int xbldg;
 extern Car *car;
 extern int numCars;
 
-/* Building file descriptor */
+// File descriptor for the building file
 FILE* bfd;
 
-
+// Function declarations
 extern void hideCursor();
 void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow);
 extern COORD getCursorPosition();
