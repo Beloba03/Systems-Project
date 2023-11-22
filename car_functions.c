@@ -109,11 +109,11 @@ int getStartAndEndCoordinates() {
 
     for(int i = 0; i < numCars; i++)
     {
-        car[i].x = tempCoord[i].X * SCALE_FACTOR + startOffset.X;
-        car[i].y = tempCoord[i].Y * SCALE_FACTOR + startOffset.Y;
+        car[i].x = tempCoord[i].X * SCALE_FACTOR + startOffset.X + 1;
+        car[i].y = tempCoord[i].Y * SCALE_FACTOR + startOffset.Y + 1;
 
-        car[i].endPos.X = SCALE_FACTOR*car[i].endPos.X;
-        car[i].endPos.Y = SCALE_FACTOR*car[i].endPos.Y;
+        car[i].endPos.X = SCALE_FACTOR*car[i].endPos.X + 1;
+        car[i].endPos.Y = SCALE_FACTOR*car[i].endPos.Y + 1;
     }
     return numCars;
     
@@ -145,8 +145,8 @@ void updateEndCoordinates() {
     printf("                                                                                         \
     \n                                                                                  "); // Clear the lines
     car[numCar].endQuad = mapInputToQuad(quadString);
-    car[numCar].endPos.X = SCALE_FACTOR*car[numCar].endPos.X;
-    car[numCar].endPos.Y = SCALE_FACTOR*car[numCar].endPos.Y;
+    car[numCar].endPos.X = SCALE_FACTOR*car[numCar].endPos.X+1;
+    car[numCar].endPos.Y = SCALE_FACTOR*car[numCar].endPos.Y+1;
 
     setCursorPosition(tempCord.X, tempCord.Y);
     trigger = numCar+1;
@@ -204,199 +204,256 @@ void updateCar(CarDirection carDirection, int carNum) {
     printf("%i", carNum);
 }
 
-// Function to animate the car's movement between current location and end location
-void animateCar(int carNum) {
-    COORD tempCord;
-    static int toggle[MAX_CAR_NUM] = {0}, count[MAX_CAR_NUM], toggleInside[MAX_CAR_NUM] = {0};
+// // Function to animate the car's movement between current location and end location
+// void animateCar(int carNum) {
+//     COORD tempCord;
+//     static int toggle[MAX_CAR_NUM] = {0}, count[MAX_CAR_NUM], toggleInside[MAX_CAR_NUM] = {0};
 
-    if(trigger != 0) // This is used to reset the function when the user updates the end position
+//     if(trigger != 0) // This is used to reset the function when the user updates the end position
+//     {
+//         toggle[trigger-1] = 0;
+//         count[trigger-1] = 0;
+//         toggleInside[trigger-1] = 0;
+//         trigger = 0;
+//     }
+
+//     // Check if the destination is to the right
+//     if(car[carNum].x < car[carNum].endPos.X && toggle[carNum] == 0) {
+//         updateCar(MOVE_RIGHT, carNum);
+//         toggleInside[carNum] = 0;
+//     }   
+//     // Check if the destination is to the left
+//     else if(car[carNum].x > car[carNum].endPos.X && toggle[carNum] == 0) {
+//         updateCar(MOVE_LEFT, carNum);
+//         toggleInside[carNum] = 0;
+//     }
+//     // Check if the destination is below
+//     else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
+//         updateCar(MOVE_DOWN, carNum);
+//         toggleInside[carNum] = 0;
+//     }
+//     // Check if the destination is above
+//     else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
+//         updateCar(MOVE_UP, carNum);
+//         toggleInside[carNum] = 0;
+//     }
+//     // This occurs when the vehicle has reached the dest intersection. It executes a move to the correct quadrant
+//     else{
+//         toggle[carNum] = 1;
+//         if(car[carNum].endQuad == S) // Move to the south quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 3;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else
+//                 toggleInside[carNum] = 2;
+            
+            
+//         }
+//         if(car[carNum].endQuad == SW) // Move to the southwest quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 2;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else
+//                 toggleInside[carNum] = 2;
+//         }
+//         if(car[carNum].endQuad == W) // Move to the west quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 3;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count[carNum]--;
+//             }
+//             else
+//                 toggleInside[carNum] = 2;
+//         }
+//         if(car[carNum].endQuad == SE) // Move to the southeast quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 4;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else
+//                 toggleInside[carNum] = 2;
+//         }
+//         if(car[carNum].endQuad == NE) // Move to the northeast quadrent
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 4;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 1)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 1)
+//                 toggleInside[carNum] = 2;
+//             if(toggleInside[carNum] == 2)
+//             {
+//                 count[carNum] = 5;
+//                 toggleInside[carNum] = 3;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 3)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 3)
+//                 toggleInside[carNum] = 4;
+            
+//         }
+//         if(car[carNum].endQuad == N) // Move to the north quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 6;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 1)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 1)
+//                 toggleInside[carNum] = 2;
+//             if(toggleInside[carNum] == 2)
+//             {
+//                 count[carNum] = 3;
+//                 toggleInside[carNum] = 3;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 3)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 3)
+//                 toggleInside[carNum] = 4;
+//         }
+//         if(car[carNum].endQuad == NW) // Move to the northwest quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 4;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 1)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count[carNum]--;
+//             }
+//         }
+//         if(car[carNum].endQuad == E) // Move to the east quadrant
+//         {
+//             if(toggleInside[carNum] == 0)
+//             {
+//                 count[carNum] = 5;
+//                 toggleInside[carNum] = 1;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 1)
+//             {
+//                 updateCar(MOVE_LEFT, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 1)
+//                 toggleInside[carNum] = 2;
+//             if(toggleInside[carNum] == 2)
+//             {
+//                 count[carNum] = 3;
+//                 toggleInside[carNum] = 3;
+//             }
+//             if(count[carNum] > 0 && toggleInside[carNum] == 3)
+//             {
+//                 updateCar(MOVE_UP, carNum);
+//                 count[carNum]--;
+//             }
+//             else if(toggleInside[carNum] == 3)
+//                 toggleInside[carNum] = 4;
+//         }
+//     }
+//     Sleep(200); // Delay the animation
+// }
+void debugPrint(int one, int two, char three)
+{
+    COORD prevPos = getCursorPosition();
+    setCursorPosition(0, SCALE_FACTOR*ybldg+8);
+    printf("Dir1: %i, Start Y: %i, End X: %c                  \n", one , two, three);
+    setCursorPosition(prevPos.X, prevPos.Y);
+}
+int getStDir(int y)
+{
+    if(cityGrid[y-3][0] == 'L')
+        return 1;
+    else
+        return -1;
+}
+int getAvDir(int x)
+{
+    if(cityGrid[0][x] == 'D')
+        return 1;
+    else
+        return -1;
+}
+int greaterOrLess(int pos1, int pos2)
+{
+    if(pos1 < pos2)
+        return 1;
+    else if (pos1 > pos2)
+        return -1;
+    else
+        return 0;
+
+}
+void animateCarNew(int carNum)
+{
+    int dir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
+    static int count = 0, startInd = 0;
+    debugPrint(dir, getStDir(car[carNum].y), 12);
+    if(getStDir(car[carNum].y) == dir)
     {
-        toggle[trigger-1] = 0;
-        count[trigger-1] = 0;
-        toggleInside[trigger-1] = 0;
-        trigger = 0;
+        if(dir == 1)
+            updateCar(MOVE_RIGHT, carNum);
+        else
+            updateCar(MOVE_LEFT, carNum);
+        startInd = 1;
+        if(getStDir(car[carNum].y + 6) == dir && car[carNum].endPos.Y == car[carNum].y+6)
+            dir = !dir;
+    }
+    else if (count < SCALE_FACTOR && startInd == 0)
+    {
+        if(getAvDir(car[carNum].x) == 1)
+            updateCar(MOVE_DOWN, carNum);
+        else
+            updateCar(MOVE_UP, carNum);
+        count++;
     }
 
-    // Check if the destination is to the right
-    if(car[carNum].x < car[carNum].endPos.X && toggle[carNum] == 0) {
-        updateCar(MOVE_RIGHT, carNum);
-        toggleInside[carNum] = 0;
-    }   
-    // Check if the destination is to the left
-    else if(car[carNum].x > car[carNum].endPos.X && toggle[carNum] == 0) {
-        updateCar(MOVE_LEFT, carNum);
-        toggleInside[carNum] = 0;
-    }
-    // Check if the destination is below
-    else if(car[carNum].y < car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
-        updateCar(MOVE_DOWN, carNum);
-        toggleInside[carNum] = 0;
-    }
-    // Check if the destination is above
-    else if(car[carNum].y > car[carNum].endPos.Y + startOffset.Y && toggle[carNum] == 0) {
-        updateCar(MOVE_UP, carNum);
-        toggleInside[carNum] = 0;
-    }
-    // This occurs when the vehicle has reached the dest intersection. It executes a move to the correct quadrant
-    else{
-        toggle[carNum] = 1;
-        if(car[carNum].endQuad == S) // Move to the south quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 2;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else
-                toggleInside[carNum] = 2;
-            
-            
-        }
-        if(car[carNum].endQuad == SW) // Move to the southwest quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 1;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else
-                toggleInside[carNum] = 2;
-        }
-        if(car[carNum].endQuad == W) // Move to the west quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 2;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-            else
-                toggleInside[carNum] = 2;
-        }
-        if(car[carNum].endQuad == SE) // Move to the southeast quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else
-                toggleInside[carNum] = 2;
-        }
-        if(car[carNum].endQuad == NE) // Move to the northeast quadrent
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 1)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 1)
-                toggleInside[carNum] = 2;
-            if(toggleInside[carNum] == 2)
-            {
-                count[carNum] = 4;
-                toggleInside[carNum] = 3;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 3)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 3)
-                toggleInside[carNum] = 4;
-            
-        }
-        if(car[carNum].endQuad == N) // Move to the north quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 1)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 1)
-                toggleInside[carNum] = 2;
-            if(toggleInside[carNum] == 2)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 3;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 3)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 3)
-                toggleInside[carNum] = 4;
-        }
-        if(car[carNum].endQuad == NW) // Move to the northwest quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 3;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 1)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-        }
-        if(car[carNum].endQuad == E) // Move to the east quadrant
-        {
-            if(toggleInside[carNum] == 0)
-            {
-                count[carNum] = 4;
-                toggleInside[carNum] = 1;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 1)
-            {
-                updateCar(MOVE_LEFT, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 1)
-                toggleInside[carNum] = 2;
-            if(toggleInside[carNum] == 2)
-            {
-                count[carNum] = 2;
-                toggleInside[carNum] = 3;
-            }
-            if(count[carNum] > 0 && toggleInside[carNum] == 3)
-            {
-                updateCar(MOVE_UP, carNum);
-                count[carNum]--;
-            }
-            else if(toggleInside[carNum] == 3)
-                toggleInside[carNum] = 4;
-        }
-    }
-    Sleep(200); // Delay the animation
+    Sleep(200);
 }

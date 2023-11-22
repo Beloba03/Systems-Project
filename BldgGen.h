@@ -26,7 +26,7 @@ Building file structure:
 
 #define TRUNCATE(name)	name[strlen(name)-1] = '\0'  // Macro to truncate last character of a string
 #define NAMELEN	16	/* Maximum length for filename */
-#define SCALE_FACTOR 5
+#define SCALE_FACTOR 6
 #define N_NUM 1
 #define NW_NUM 2
 #define W_NUM 3
@@ -39,6 +39,7 @@ Building file structure:
 #define MAX_CAR_NUM 4
 #define UPDATE_INPUT_OFFSET 7
 #define BUILDING_OFFSET 2
+#define LAST_STREET_OFFSET 3
 
 // Enumerations for defining directions and building types
 enum ST_DIR { East, West };
@@ -99,5 +100,6 @@ void setCursorPosition(int x, int y);
 extern void read_file();
 extern int getStartAndEndCoordinates();
 extern void updateEndCoordinates();
-extern void animateCar(int carNum);
+//extern void animateCar(int carNum);
+extern void animateCarNew(int carNum);
 extern void freeGrid(unsigned int ySize);

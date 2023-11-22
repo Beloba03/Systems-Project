@@ -30,19 +30,20 @@ char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
 
 // Function to initialize the city grid
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
-    cityGrid = (char**)malloc((SCALE_FACTOR * ySize + 6) * sizeof(char*)); // Allocate memory for the city grid (y)
+    cityGrid = (char**)malloc((SCALE_FACTOR * ySize + LAST_STREET_OFFSET) * sizeof(char*)); // Allocate memory for the city grid (y)
     if(cityGrid == NULL) // Check if memory allocation was successful
     {
         printf("Failed to allocate memory for cityGrid");
         getchar();
         exit(EXIT_FAILURE);
     }
-    int skipVer = 1, skipHor; // Variables to track which cells to skip (the streets)
+    int skipVer = 1, skipHor, vertFlip = a1dir, horizFlip, flipper = 0; // Variables to track which cells to skip (the streets)
 
     // Iterate through the city grid and set the appropriate cells to the appropriate characters
-    for (unsigned int i = 0; i < SCALE_FACTOR * ySize + 2; i++) {
+    for (unsigned int i = 0; i < SCALE_FACTOR * ySize + LAST_STREET_OFFSET; i++) {
         skipHor = 1;
-        cityGrid[i] = (char*)malloc((SCALE_FACTOR * xSize + 2) * sizeof(char)); // Allocate memory for the city grid (x)
+        vertFlip = s1dir;
+        cityGrid[i] = (char*)malloc((SCALE_FACTOR * xSize + LAST_STREET_OFFSET) * sizeof(char)); // Allocate memory for the city grid (x)
         if(cityGrid[i] == NULL)
         {
             printf("Failed to allocate memory for cityGrid[%d]", i);
@@ -50,12 +51,42 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
             exit(EXIT_FAILURE);
         }
         // Iterate through each line of the city grid
-        for (unsigned int j = 0; j < SCALE_FACTOR * xSize + 2; j++) {
-            if (i % SCALE_FACTOR == 0 || j % SCALE_FACTOR == 0 || i % SCALE_FACTOR == 1 || j % SCALE_FACTOR == 1) {
+        for (unsigned int j = 0; j < SCALE_FACTOR * xSize + LAST_STREET_OFFSET; j++) {
+            if (i % SCALE_FACTOR == 1 && j % SCALE_FACTOR == 1) {
+                cityGrid[i][j] = 'I'; // Intersection
+            } else if (i % SCALE_FACTOR == 1) {
+                if(i == 1 || i == (SCALE_FACTOR * ySize + 1))
+                {
+                    cityGrid[i][j] = '+';
+                }
+                else if(horizFlip == 0) // Horizontal street
+                {
+                    cityGrid[i][j] = 'L';
+                }
+                else
+                {
+                    cityGrid[i][j] = 'R';
+                }
+                flipper = 0;
+            } else if (j % SCALE_FACTOR == 1) {
+                if(j == 1 || j == (SCALE_FACTOR * xSize + 1))
+                {
+                    cityGrid[i][j] = '-';
+                }
+                else if(vertFlip == 0) // Verticalal street
+                {
+                    cityGrid[i][j] = 'U';
+                    vertFlip = !vertFlip;
+                }
+                else
+                {
+                    cityGrid[i][j] = 'D';
+                    vertFlip = !vertFlip;
+                }
+            } else if(i % SCALE_FACTOR == 0 || j % SCALE_FACTOR == 0 || i % SCALE_FACTOR == 2 || j % SCALE_FACTOR == 2){
                 cityGrid[i][j] = ' ';
-                skipHor = !skipHor;
-            }
-            else if(skipVer != 0){
+                skipHor = 0;
+            } else if(skipVer != 0) {
                 if(skipHor != 1)
                 {
                     cityGrid[i][j] = 'O';
@@ -65,9 +96,13 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
                 {
                     cityGrid[i][j] = '#';
                     skipHor = !skipHor;
+                    if(flipper == 0)
+                    {
+                        horizFlip = !horizFlip;
+                        flipper = 1;
+                    }
                 }
-            }
-            else
+            } else
                 cityGrid[i][j] = 'O';
         }
         skipVer = !skipVer;
@@ -77,8 +112,8 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 // Prints the city grid to the console
 void printGrid(unsigned int xSize, unsigned int ySize) {
     setCursorPosition(startOffset.X, startOffset.Y);
-    for (unsigned int y = 0; y < (ySize * SCALE_FACTOR) + 1; y++) {
-        for (unsigned int x = 0; x < (xSize * SCALE_FACTOR) + 1; x++) {
+    for (unsigned int y = 0; y < (ySize * SCALE_FACTOR) + LAST_STREET_OFFSET; y++) {
+        for (unsigned int x = 0; x < (xSize * SCALE_FACTOR) + LAST_STREET_OFFSET; x++) {
                 printf("%c", cityGrid[y][x]);
         }
         printf("\n");
@@ -169,7 +204,7 @@ void read_file() {
 
 // Function to free allocated memory for the city grid and cars
 void freeGrid(unsigned int ySize) {
-    for (unsigned int i = 0; i < (SCALE_FACTOR * ySize + 2); i++) {
+    for (unsigned int i = 0; i < (SCALE_FACTOR * ySize + LAST_STREET_OFFSET); i++) {
         free(cityGrid[i]);
     }
     free(cityGrid);

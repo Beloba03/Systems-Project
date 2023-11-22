@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
         // Animate each car on the grid.
         for (int i = 0; i < numCars; i++) {
-            animateCar(i);
+            animateCarNew(i);
         }
     }
     // Set the cursor position to the bottom of the grid.
