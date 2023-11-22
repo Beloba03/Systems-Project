@@ -434,7 +434,7 @@ int greaterOrLess(int pos1, int pos2)
 void animateCarNew(int carNum)
 {
     int dir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
-    static int count = 0, startInd = 0, shortStopX = 0;
+    static int count = 0, startInd = 0, shortStopX = 0, shortStopY = 0;
     debugPrint(dir, getStDir(car[carNum].y), 12);
     if(getStDir(car[carNum].y) == dir && shortStopX == 0)
     {
@@ -443,7 +443,7 @@ void animateCarNew(int carNum)
         else
             updateCar(MOVE_LEFT, carNum);
         startInd = 1;
-        if(greaterOrLess(car[carNum].y, car[carNum].endPos.Y) == getAvDir(car[carNum].endPos.X) && car[carNum].endPos.X == car[carNum].x+6)
+        if(greaterOrLess(car[carNum].endPos.Y, car[carNum].y) == getAvDir(car[carNum].endPos.X) && car[carNum].endPos.X == car[carNum].x+6)
             shortStopX = 1;
     }
     else if (count < SCALE_FACTOR && startInd == 0)
@@ -454,22 +454,15 @@ void animateCarNew(int carNum)
             updateCar(MOVE_UP, carNum);
         count++;
     }
-    else if(car[carNum].y != car[carNum].endPos.Y)
+    else if(car[carNum].y != car[carNum].endPos.Y && shortStopY == 0)
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
         else
             updateCar(MOVE_UP, carNum);
+        if(greaterOrLess(car[carNum].x, car[carNum].endPos.X) == getStDir(car[carNum].endPos.X) && car[carNum].endPos.X == car[carNum].x+6)
+            shortStopY = 1;
     }
-    else if(car[carNum].x != car[carNum].endPos.X)
-    {
-        if(getStDir(car[carNum].y) == 1)
-            updateCar(MOVE_RIGHT, carNum);
-        else
-            updateCar(MOVE_LEFT, carNum);
-    }
-    else
-        updateCar(MOVE_UP, carNum);
 
     Sleep(200);
 }
