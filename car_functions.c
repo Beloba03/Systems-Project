@@ -443,7 +443,7 @@ void animateCarNew(int carNum)
         else
             updateCar(MOVE_LEFT, carNum);
         startInd = 1;
-        if(getStDir(car[carNum].y + 6) == dir && car[carNum].endPos.Y == car[carNum].y+6)
+        if(getAvDir(car[carNum].x + 6) == dir && car[carNum].endPos.X == car[carNum].x+6)
             dir = !dir;
     }
     else if (count < SCALE_FACTOR && startInd == 0)
