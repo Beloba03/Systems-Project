@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "Systems Project",
+			"path": "."
+		},
+		{
+			"name": "Entry Creation",
+			"path": "../Entry Creation"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.c2": "c",
+			"bldggen.h": "c"
+		}
+	}
+}
