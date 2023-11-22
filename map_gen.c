@@ -30,7 +30,7 @@ char getBuildingTypeRepresentation(enum BLDG_TYPE type) {
 
 // Function to initialize the city grid
 void initializeGrid(unsigned int xSize, unsigned int ySize) {
-    cityGrid = (char**)malloc((4 * ySize + 6) * sizeof(char*)); // Allocate memory for the city grid (y)
+    cityGrid = (char**)malloc((SCALE_FACTOR * ySize + 6) * sizeof(char*)); // Allocate memory for the city grid (y)
     if(cityGrid == NULL) // Check if memory allocation was successful
     {
         printf("Failed to allocate memory for cityGrid");
@@ -40,9 +40,9 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
     int skipVer = 1, skipHor; // Variables to track which cells to skip (the streets)
 
     // Iterate through the city grid and set the appropriate cells to the appropriate characters
-    for (unsigned int i = 0; i < 4 * ySize + 2; i++) {
+    for (unsigned int i = 0; i < SCALE_FACTOR * ySize + 2; i++) {
         skipHor = 1;
-        cityGrid[i] = (char*)malloc((4 * xSize + 2) * sizeof(char)); // Allocate memory for the city grid (x)
+        cityGrid[i] = (char*)malloc((SCALE_FACTOR * xSize + 2) * sizeof(char)); // Allocate memory for the city grid (x)
         if(cityGrid[i] == NULL)
         {
             printf("Failed to allocate memory for cityGrid[%d]", i);
@@ -50,8 +50,8 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
             exit(EXIT_FAILURE);
         }
         // Iterate through each line of the city grid
-        for (unsigned int j = 0; j < 4 * xSize + 2; j++) {
-            if (i % 4 == 0 || j % 4 == 0) {
+        for (unsigned int j = 0; j < SCALE_FACTOR * xSize + 2; j++) {
+            if (i % SCALE_FACTOR == 0 || j % SCALE_FACTOR == 0 || i % SCALE_FACTOR == 1 || j % SCALE_FACTOR == 1) {
                 cityGrid[i][j] = ' ';
                 skipHor = !skipHor;
             }
@@ -77,8 +77,8 @@ void initializeGrid(unsigned int xSize, unsigned int ySize) {
 // Prints the city grid to the console
 void printGrid(unsigned int xSize, unsigned int ySize) {
     setCursorPosition(startOffset.X, startOffset.Y);
-    for (unsigned int y = 0; y < (ySize * 4) + 1; y++) {
-        for (unsigned int x = 0; x < (xSize * 4) + 1; x++) {
+    for (unsigned int y = 0; y < (ySize * SCALE_FACTOR) + 1; y++) {
+        for (unsigned int x = 0; x < (xSize * SCALE_FACTOR) + 1; x++) {
                 printf("%c", cityGrid[y][x]);
         }
         printf("\n");
@@ -169,7 +169,7 @@ void read_file() {
 
 // Function to free allocated memory for the city grid and cars
 void freeGrid(unsigned int ySize) {
-    for (unsigned int i = 0; i < (4 * ySize + 2); i++) {
+    for (unsigned int i = 0; i < (SCALE_FACTOR * ySize + 2); i++) {
         free(cityGrid[i]);
     }
     free(cityGrid);

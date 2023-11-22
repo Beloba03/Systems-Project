@@ -26,7 +26,7 @@ Building file structure:
 
 #define TRUNCATE(name)	name[strlen(name)-1] = '\0'  // Macro to truncate last character of a string
 #define NAMELEN	16	/* Maximum length for filename */
-#define SCALE_FACTOR 4
+#define SCALE_FACTOR 5
 #define N_NUM 1
 #define NW_NUM 2
 #define W_NUM 3
