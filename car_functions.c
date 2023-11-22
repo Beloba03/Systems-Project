@@ -434,17 +434,17 @@ int greaterOrLess(int pos1, int pos2)
 void animateCarNew(int carNum)
 {
     int dir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
-    static int count = 0, startInd = 0;
+    static int count = 0, startInd = 0, shortStop = 0;
     debugPrint(dir, getStDir(car[carNum].y), 12);
-    if(getStDir(car[carNum].y) == dir)
+    if(getStDir(car[carNum].y) == dir && shortStop == 0)
     {
         if(dir == 1)
             updateCar(MOVE_RIGHT, carNum);
         else
             updateCar(MOVE_LEFT, carNum);
         startInd = 1;
-        if(getAvDir(car[carNum].x + 6) == dir && car[carNum].endPos.X == car[carNum].x+6)
-            dir = !dir;
+        if(greaterOrLess(car[carNum].y, car[carNum].endPos.Y) == getAvDir(car[carNum].endPos.X) && car[carNum].endPos.X == car[carNum].x+6)
+            shortStop = 1;
     }
     else if (count < SCALE_FACTOR && startInd == 0)
     {
