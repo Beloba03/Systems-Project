@@ -1,0 +1,262 @@
+
+Function to animate car movement on the console
+void animateCar(int carNum) {
+    COORD tempCord;
+
+    if(car[carNum].x < car[carNum].endPos.X * 4) {
+        if(((car[carNum].x/4)%2) - s1dir != 0)
+        {
+            updateCar(MOVE_RIGHT, carNum);
+            debugPrint("XR");
+        }
+        else
+        {
+            updateCar(MOVE_DOWN, carNum);
+            debugPrint("YD");
+        }
+    }   
+    else if(car[carNum].x > car[carNum].endPos.X * 4) {
+        if(((car[carNum].x/4)%2) - s1dir != 0)
+        {
+            updateCar(MOVE_LEFT, carNum);
+            debugPrint("XL");
+        }
+        else
+        {
+            updateCar(MOVE_UP, carNum);
+            debugPrint("YU");
+        }
+    }
+    else if(car[carNum].y < car[carNum].endPos.Y * 4 + startOffset.Y) {
+        if(((car[carNum].y/4)%2) - a1dir != 0)
+        {
+            updateCar(MOVE_DOWN, carNum);
+            debugPrint("YD");
+        }
+        else
+        {
+            updateCar(MOVE_RIGHT, carNum);
+            debugPrint("XR");
+        }
+    }
+    else if(car[carNum].y > car[carNum].endPos.Y * 4 + startOffset.Y) {
+        if(((car[carNum].y/4)%2) - a1dir != 0)
+        {
+            updateCar(MOVE_UP, carNum);
+            debugPrint("YU");
+        }
+        else
+        {
+            updateCar(MOVE_LEFT, carNum);
+            debugPrint("XL");
+        }
+    }
+    Sleep(200);
+}
+
+void animateCar(int carNum)
+{
+    static int state, count = 0, start = 1, undershootIndX = 0, undershootIndY = 0, arrivedStat = 0;
+    int numStepsX = car[carNum].endPos.X * 4 - car[carNum].x, numStepsY = car[carNum].endPos.Y * 4 + startOffset.Y - car[carNum].y;
+    if(count == 0)
+    {
+        if((((car[carNum].x/4)%2) - s1dir) != 0 && start == 1) // has to move up/down 1 to be able to move horiz
+        {
+            state = 0;
+            count = 4;
+        }
+        else // can move in horiz for start
+        {
+            state = 1;
+            if((((car[carNum].endPos.Y/4)%2)+a1dir) != 0) // if dest col is wrong direction
+            {
+                count = numStepsX;
+                undershootIndX = 1;
+            }
+            else // if dest col is right direction
+            {
+                count = numStepsX - 4;
+                undershootIndX = 0;
+            }
+            start = 0;
+        }
+        if((((car[carNum].endPos.X/4)%2)+s1dir) != 0 && arrivedStat == 1)
+        {
+            state = 2;
+            start = 0;
+            count = numStepsY - 4;
+            undershootIndY = 1;
+        }
+        else if((((car[carNum].endPos.X/4)%2)+a1dir) == 0 && arrivedStat == 1)
+        {
+            state = 2;
+            start = 0;
+            count = numStepsY;
+            undershootIndY = 0;
+        }
+        else if((numStepsX-4*undershootIndX) == 0 && arrivedStat == 1)
+        {
+            state = 2;
+            start = 0;
+            count = numStepsY;
+            undershootIndY = 0;
+        }
+    }
+    //debugPrint(state, arrivedStat, (((car[carNum].endPos.X/4)%2)+s1dir));
+    switch(state){
+        case 0:
+            if((((car[carNum].x/4)%2) - s1dir) != 0)
+            {
+                updateCar(MOVE_DOWN, carNum);
+                count--;
+            }
+            else
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            if(count == 0)
+            {
+                start = 0;
+            }
+            break;
+        case 1:
+            if(numStepsX > 0)
+            {
+                updateCar(MOVE_RIGHT, carNum);
+                count--;
+            }
+            else if(numStepsX < 0)
+            {
+                updateCar(MOVE_LEFT, carNum);
+                count--;
+            }
+            else
+             arrivedStat = 1;
+            break;
+        case 2:
+            if(numStepsY > 0)
+            {
+                updateCar(MOVE_DOWN, carNum);
+                count--;
+            }
+            else if(numStepsY < 0)
+            {
+                updateCar(MOVE_UP, carNum);
+                count--;
+            }
+            break;
+        default:
+            break;
+    }
+    Sleep(200);
+}
+
+void animateCar(int carNum)
+{
+    static int complete = 0, count = 0, oneColShort = 0, state = 0; // state 1 = UP, 2 = DOWN, 3 = RIGHT, 4 = LEFT
+    if(count <= 0)
+    {
+        if((car[carNum].y/4)-s1dir != (car[carNum].endPos.Y/4)-s1dir && complete == 0) // if curent dir is not point towards dest go rowDir by 4
+        {
+            if(car[carNum].x/4 == 1)
+            {
+                state = 1;
+                count = 4;
+            }
+            else{
+                state = 2;
+                count = 4;
+            }
+        }
+        else if(complete == 0) // if current dir is right go to dest column
+        {
+            if(car[carNum].y/4 == 1)
+            {
+                state = 4;
+            }
+            else{
+                state = 3;
+            }
+            if((car[carNum].endPos.X/4)-s1dir != (car[carNum].x/4)-s1dir) // if dest column is wrong dir go 4 less
+            {
+                    oneColShort = 1;
+                    complete = 1;
+            }
+            else{ // otherwise go to dest
+                oneColShort = 0;
+                complete = 6;
+            }
+            count = abs(car[carNum].endPos.X * 4 - car[carNum].x) - 4*oneColShort;
+        }
+        else if(complete == 1) 
+        {
+            if(car[carNum].x/4 == 1) // if dest row is wrong dir go 4 more
+            {
+                state = 1;
+                printf("here");
+                count = abs(car[carNum].endPos.Y * 4 + startOffset.Y - car[carNum].y) - 4;
+                complete = 3;
+
+            }
+            else{ // if dest row is right dir go to dest row
+                state = 2;
+                printf("here2");
+                count = abs(car[carNum].endPos.Y + startOffset.Y - car[carNum].y);
+                complete = 4;
+
+            }
+        }
+        else if(complete == 3) // if dest row was over shot, move over 4 in current row dir
+        {
+            if(car[carNum].y/4 == 1)
+            {
+                state = 4;
+                count = 4;
+            }
+            else{
+                state = 3;
+                count = 4;
+            }
+            complete = 4;
+        }
+        else if(complete == 4)
+        {
+            if(car[carNum].x/4 == 1) // finally go by 4 in dir and reach destination
+            {
+                state = 1;
+                count = 4;
+                complete = 5;
+            }
+            else{ 
+                state = 2;
+                count = 4;
+                complete = 5;
+            }
+        }
+    }
+    debugPrint(state, count, oneColShort, complete);
+    switch(state)
+    {
+        case 1:
+            updateCar(MOVE_UP, carNum);
+            count--;
+            break;
+        case 2:
+            updateCar(MOVE_DOWN, carNum);
+            count--;
+            break;
+        case 3:
+            updateCar(MOVE_RIGHT, carNum);
+            count--;
+            break;
+        case 4:
+            updateCar(MOVE_LEFT, carNum);
+            count--;
+            break;
+        default:
+            break;
+    }
+    Sleep(200);
+
+}

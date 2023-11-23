@@ -14,9 +14,7 @@ int main(int argc, char *argv[]) {
     
     // Check if the user has provided the correct number of arguments.
     if (argc != 2) {
-        printf("Supply name of data file\n");
-        (void) getchar(); // Wait for a character input before exiting.
-        return 1;        // Return an error code.
+        argv[1] = "C:\\Users\\benb\\Desktop\\System Analysis\\Systems Project\\bin\\test";
     }
 
     // Attempt to open the provided data file for reading.
@@ -64,5 +62,3 @@ int main(int argc, char *argv[]) {
 
     return 0; // Return a success code.
 }
-
-//AARON WAS HERE, testing out commit
