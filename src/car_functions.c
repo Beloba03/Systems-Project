@@ -6,7 +6,7 @@ This module contains functions relating to the car's initialization ,movement, a
 */
 
 #include "BldgGen.h"
-
+#define DEBUG // Comment this out to remove debug information
 unsigned int trigger = 0; // This is used to select which car to update the end position of
 
 // Declare a car variable array
@@ -46,17 +46,6 @@ enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
         exit(EXIT_FAILURE);
     }
 }
-
-
-// Function can be used to print debug information at the bottom of the console window
-#ifdef DEBUG
- void debugPrint(int state, int other, int under, int complete) {
-     COORD tempCord = getCursorPosition();
-     setCursorPosition(0, SCALE_FACTOR*ybldg+8);
-     printf("Start X: %d, Start Y: %d, End X: %d, End Y: %d      \n", state , other, under, complete);
-     setCursorPosition(tempCord.X, tempCord.Y);
- }
-#endif
 
 
 // Gets the start and end coordinates for the cars from the user
@@ -402,6 +391,9 @@ void updateCar(CarDirection carDirection, int carNum) {
 //     }
 //     Sleep(200); // Delay the animation
 // }
+
+// Debug information for the car's movement
+#ifdef DEBUG
 void debugPrint(int one, int two, char three, int four)
 {
     COORD prevPos = getCursorPosition();
@@ -409,6 +401,8 @@ void debugPrint(int one, int two, char three, int four)
     printf("CurX: %i, EndX: %i, Dir: %c, SSY: %i                  \n", one , two, three, four);
     setCursorPosition(prevPos.X, prevPos.Y);
 }
+#endif
+// This function checks the direction of a street at a given y coordinate
 int getStDir(int y)
 {
     if(cityGrid[y-3][0] == 'R')
@@ -420,6 +414,7 @@ int getStDir(int y)
     else
         return 2;
 }
+// This function checks the direction of an avenue at a given x coordinate
 int getAvDir(int x)
 {
     if(cityGrid[0][x] == 'D')
@@ -431,6 +426,7 @@ int getAvDir(int x)
     else
         return 2;
 }
+// Checks if two coordinates are greater or less than each other
 int greaterOrLess(int pos1, int pos2)
 {
     if(pos1 < pos2)
@@ -441,26 +437,27 @@ int greaterOrLess(int pos1, int pos2)
         return 0;
 
 }
+// This function animates the car's movement between current location and end intersection
 void animateCarNew(int carNum)
 {
-    int gr = greaterOrLess(car[carNum].endPos.X, car[carNum].x) , std = getStDir(car[carNum].endPos.Y+3), endpos = car[carNum].endPos.Y, curpos = car[carNum].y, ything = greaterOrLess(car[carNum].endPos.Y+3, car[carNum].y);
-    int dir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
+    int gr = greaterOrLess(car[carNum].endPos.X, car[carNum].x) , std = getStDir(car[carNum].endPos.Y+3), endpos = car[carNum].endPos.Y, curpos = car[carNum].y, ything = greaterOrLess(car[carNum].endPos.Y+3, car[carNum].y); // For debugging
+    int dir = greaterOrLess(car[carNum].x, car[carNum].endPos.X); // Direction of the car from the end intersection in the x direction
     static int count = 0, startInd = 0, shortStopX = 0, shortStopY = 0, passY = 0;
-        if((getStDir(car[carNum].y) == dir || getStDir(car[carNum].y) == 0) && shortStopX == 0 && dir != 0)
+        if((getStDir(car[carNum].y) == dir || getStDir(car[carNum].y) == 0) && shortStopX == 0 && dir != 0) // Checks if the car is on the correct street (it points towards the end point)
     {
-        if(dir == 1)
+        if(dir == 1) // Move the car in the correct direction
             updateCar(MOVE_RIGHT, carNum);
         else if(dir == -1)
             updateCar(MOVE_LEFT, carNum);
         startInd = 1;
-        if(greaterOrLess(car[carNum].endPos.Y, car[carNum].y) == getAvDir(car[carNum].endPos.X) && (car[carNum].endPos.X == car[carNum].x+6 || car[carNum].endPos.X == car[carNum].x-6))
+        if(greaterOrLess(car[carNum].endPos.Y, car[carNum].y) == getAvDir(car[carNum].endPos.X) && (car[carNum].endPos.X == car[carNum].x+6 || car[carNum].endPos.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
             shortStopX = 1;
     }
-    else if(greaterOrLess(car[carNum].endPos.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endPos.Y +3, car[carNum].y) == 0)
+    else if(greaterOrLess(car[carNum].endPos.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endPos.Y +3, car[carNum].y) == 0) // Checks if the car has reached the end intersection
     {
 
     }
-    else if ((getStDir(car[carNum].y) == !dir || getStDir(car[carNum].y) == 0) && startInd == 0)
+    else if ((getStDir(car[carNum].y) == !dir || getStDir(car[carNum].y) == 0) && startInd == 0) // Moves the car along the current avenue until the next street in the right direction (this is if it starts where there is no street or if the street points in te wrong direction)
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
@@ -468,35 +465,34 @@ void animateCarNew(int carNum)
             updateCar(MOVE_UP, carNum);
         count++;
     }
-    else if(car[carNum].y != car[carNum].endPos.Y+3 && shortStopY == 0)
+    else if(car[carNum].y != car[carNum].endPos.Y+3 && shortStopY == 0) // Move along avenue until the end intersection
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
         else
             updateCar(MOVE_UP, carNum);
         
-        if(greaterOrLess(car[carNum].endPos.X, car[carNum].x) == getStDir(car[carNum].endPos.Y+3) && (car[carNum].endPos.Y+9 == car[carNum].y|| car[carNum].endPos.Y-3 == car[carNum].y) && shortStopX == 1 && greaterOrLess(car[carNum].endPos.X, car[carNum].x) != 0)
+        if(greaterOrLess(car[carNum].endPos.X, car[carNum].x) == getStDir(car[carNum].endPos.Y+3) && (car[carNum].endPos.Y+9 == car[carNum].y|| car[carNum].endPos.Y-3 == car[carNum].y) && shortStopX == 1 && greaterOrLess(car[carNum].endPos.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
         {
             shortStopY = 1;
             count = 12;
         }
         debugPrint(car[carNum].y, car[carNum].endPos.Y, getStDir(car[carNum].y), shortStopY);
     }
-    else if(shortStopY == 1)
+    else if(shortStopY == 1) // Move past the end intersection by one block
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
         else
             updateCar(MOVE_UP, carNum);
-        
-        count--;
+                count--;
         if(count == 0)
         {
             count = 6;
             shortStopY = 2;
         }
     }
-    else if(shortStopY == 2)
+    else if(shortStopY == 2) // Move one block back towards the end intersection in the street direction
     {
         if(dir == 1)
             updateCar(MOVE_RIGHT, carNum);
@@ -509,7 +505,7 @@ void animateCarNew(int carNum)
             shortStopY = 3;
         }
     }
-    else if(shortStopY = 3 && count > 0)
+    else if(shortStopY = 3 && count > 0) // Move one block towards the end intersection in the avenue direction
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
