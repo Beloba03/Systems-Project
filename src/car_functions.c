@@ -460,7 +460,7 @@ void animateCarNew(int carNum)
     {
 
     }
-    else if (count < SCALE_FACTOR && startInd == 0)
+    else if ((getStDir(car[carNum].y) == !dir || getStDir(car[carNum].y) == 0) && startInd == 0)
     {
         if(getAvDir(car[carNum].x) == 1)
             updateCar(MOVE_DOWN, carNum);
