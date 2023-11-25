@@ -1,11 +1,5 @@
 
 /*
-Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
-November 3, 2023
-
-A the file reading portion of this code was used from the brightspace example code for building reading. 
-It was written by Dr. Hughes. 
-
 This is the header file for the AEDV program. It contains the function declarations, structure definitions, and global variables.
 
 Building file structure:
@@ -69,12 +63,21 @@ typedef enum {
     MOVE_LEFT
 } CarDirection;
 
-// Structure to define properties of a car in the city grid
+typedef enum {
+    AVAILABLE,
+    EN_ROUTE_TO_PICKUP,
+    EN_ROUTE_TO_DELIVERY,
+    DELIVERING
+} CarStatus;
+
 typedef struct {
-    unsigned int x;     // x-position
-    unsigned int y;     // y-position
-    COORD endPos;       // Ending position
-    enum QUAD endQuad;  // Ending quadrant
+    unsigned int x;          // x-position
+    unsigned int y;          // y-position
+    COORD endPos;            // Ending position
+    enum QUAD endQuad;       // Ending quadrant
+    CarStatus status;        // Status of the car regarding delivery
+    COORD pickupPos;         // Pick-up position
+    COORD deliveryPos;       // Delivery position
 } Car;
 
 // External declarations
