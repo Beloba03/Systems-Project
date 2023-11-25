@@ -319,3 +319,19 @@ void animateCarNew(int carNum)
 
     Sleep(200);
 }
+
+COORD calcIntersection(int x, int y)
+{
+    if((x-3)%6 == 0)
+    {
+
+    }
+    else if((y-3) % 6 == 0) // Inbetween 
+    {
+
+    }
+    else // Wrong COORD entered
+    {
+
+    }
+}
