@@ -76,6 +76,7 @@ typedef struct {
     COORD endPos;       // Ending position
     enum QUAD endQuad;  // Ending quadrant
     COORD endIntersection;
+    unsigned char endIntersectionStatus;
 } Car;
 
 // External declarations
@@ -104,3 +105,6 @@ extern void updateEndCoordinates();
 //extern void animateCar(int carNum);
 extern void animateCarNew(int carNum);
 extern void freeGrid(unsigned int ySize);
+
+// Global variables
+int maxCars;

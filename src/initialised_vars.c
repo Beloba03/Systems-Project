@@ -15,3 +15,4 @@ struct prompt bldg_q[] = {
 	{"NE",NE}, {"N",N}, {"NW",NW},
 	{"E",E}, {"LBL",-1}, {"W",W},
 	{"SE",SE}, {"S",S}, {"SW",SW} };
+
