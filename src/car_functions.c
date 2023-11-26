@@ -252,7 +252,6 @@ void animateCarNew(int carNum)
     }
     else
     {
-        int gr = greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) , std = getStDir(car[carNum].endIntersection.Y+3), endIntersection = car[carNum].endIntersection.Y, curpos = car[carNum].y, ything = greaterOrLess(car[carNum].endIntersection.Y+3, car[carNum].y); // For debugging
         int dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X); // Direction of the car from the end intersection in the x direction
         static int count[MAX_CAR_NUM] = {0}, startInd[MAX_CAR_NUM] = {0}, shortStopX[MAX_CAR_NUM] = {0}, shortStopY[MAX_CAR_NUM] = {0}, passY[MAX_CAR_NUM] = {0}, startIndAve[MAX_CAR_NUM] = {0}, runOnce[MAX_CAR_NUM] = {0}; // Static variables to keep track of the car's movement
         if(runOnce[carNum] == 0)
