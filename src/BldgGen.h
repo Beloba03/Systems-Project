@@ -77,6 +77,7 @@ typedef struct {
     enum QUAD endQuad;  // Ending quadrant
     COORD endIntersection;
     unsigned char endIntersectionStatus;
+    unsigned int startX;
 } Car;
 
 // External declarations
