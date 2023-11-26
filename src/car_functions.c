@@ -317,6 +317,14 @@ void animateCarNew(int carNum)
             updateCar(MOVE_UP, carNum);
         count[carNum]--;
     }
+    else if(car[carNum].y == car[carNum].endIntersection.Y+3)
+    {
+        shortStopX[carNum] = 0;
+        if(dir == 1) // Move the car in the correct direction
+            updateCar(MOVE_RIGHT, carNum);
+        else if(dir == -1)
+            updateCar(MOVE_LEFT, carNum);
+    }
 
     Sleep(200);
 }
