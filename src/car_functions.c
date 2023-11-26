@@ -248,9 +248,28 @@ void animateCarNew(int carNum)
 {
     if(car[carNum].endIntersectionStatus == 1)
     {
-
+        int xCount = car[carNum].x - car[carNum].endPos.X, yCount = car[carNum].y - car[carNum].endPos.Y-3, dirX = greaterOrLess(car[carNum].x, car[carNum].endPos.X), dirY = greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y);
+        if(xCount != 0) // Car needs to move in X direction to get to end point
+        {
+            if(dirX == 1)
+                updateCar(MOVE_RIGHT, carNum);
+            else if(dirX == -1)
+                updateCar(MOVE_LEFT, carNum);
+        }
+        else if(yCount != 0) // Car needs to move in y direction to get to end point
+        {
+            if(dirY == 1)
+                updateCar(MOVE_DOWN, carNum);
+            else if(dirY == -1)
+                updateCar(MOVE_UP, carNum);
+        }
+        else // Car has reached the end point
+        {
+            car[carNum].endIntersectionStatus = 2;
+            return;
+        }
     }
-    else
+    else if(car[carNum].endIntersectionStatus == 0)
     {
         int dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X); // Direction of the car from the end intersection in the x direction
         static int count[MAX_CAR_NUM] = {0}, startInd[MAX_CAR_NUM] = {0}, shortStopX[MAX_CAR_NUM] = {0}, shortStopY[MAX_CAR_NUM] = {0}, passY[MAX_CAR_NUM] = {0}, startIndAve[MAX_CAR_NUM] = {0}, runOnce[MAX_CAR_NUM] = {0}; // Static variables to keep track of the car's movement
