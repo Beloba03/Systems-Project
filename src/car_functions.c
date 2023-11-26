@@ -240,7 +240,7 @@ void animateCarNew(int carNum)
         }
     }
 
-    // FIX ISSUES WITH STARTING ON END COLUMN 1 8 7 7 8 S
+    // FIX ISSUES WITH STARTING ON END COLUMN 1 7 7 19 7 S
     else if(car[carNum].endIntersectionStatus == 0)
     {
         int dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X); // Direction of the car from the end intersection in the x direction
@@ -263,7 +263,7 @@ void animateCarNew(int carNum)
             else if(dir == -1)
                 updateCar(MOVE_LEFT, carNum);
             startInd[carNum] = 1;
-            if(car[carNum].x != car[carNum].endPos.X)
+            if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endPos.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
                 startIndAve[carNum] = 1;
             if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
                 shortStopX[carNum] = 1;
@@ -299,7 +299,7 @@ void animateCarNew(int carNum)
                 count[carNum] = 12;
             }
         }
-        else if ((getStDir(car[carNum].y) == !dir || getStDir(car[carNum].y) == 0) && startInd[carNum] == 0) // Moves the car along the current avenue until the next street in the right direction (this is if it starts where there is no street or if the street points in the wrong direction)
+        else if ((getStDir(car[carNum].y) == -dir || getStDir(car[carNum].y) == 0) && startInd[carNum] == 0) // Moves the car along the current avenue until the next street in the right direction (this is if it starts where there is no street or if the street points in the wrong direction)
         {
             if(getAvDir(car[carNum].x) == 1)
                 updateCar(MOVE_DOWN, carNum);
