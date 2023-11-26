@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     
     // Check if the user has provided the correct number of arguments.
     if (argc != 2) {
-        argv[1] = "C:\\Users\\benb\\Desktop\\System Analysis\\Systems Project\\bin\\test";
+        argv[1] = "runFiles\\Test";
     }
 
     // Attempt to open the provided data file for reading.

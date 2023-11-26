@@ -165,7 +165,6 @@ void read_file() {
     // Read x and y dimensions of the building from the file
     fread(&xbldg, sizeof(int), 1, bfd);
     fread(&ybldg, sizeof(int), 1, bfd);
-    numCars = getStartAndEndCoordinates();
     // 0 = East, 1 = West
     // 0 = North, 1 = South
     fread(&s1dir, sizeof(int), 1, bfd);
@@ -173,7 +172,8 @@ void read_file() {
 
     // Initialize the city grid based on the read dimensions
     initializeGrid(xbldg, ybldg);
-
+    numCars = getStartAndEndCoordinates();
+    
     // Read building data and set up the city grid
     fread(&bd, sizeof(struct bldg_data), 1, bfd);
     // Iterate while a building with x-coordinate greater than 0 is found

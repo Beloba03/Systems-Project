@@ -75,6 +75,7 @@ typedef struct {
     unsigned int y;     // y-position
     COORD endPos;       // Ending position
     enum QUAD endQuad;  // Ending quadrant
+    COORD endIntersection;
 } Car;
 
 // External declarations
