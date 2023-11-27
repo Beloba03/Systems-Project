@@ -241,7 +241,6 @@ void animateCarNew(int carNum)
         }
     }
 
-    // FIX ISSUES WITH STARTING ON END COLUMN 1 7 7 19 7 S
     else if(car[carNum].endIntersectionStatus == 0)
     {
         int dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X); // Direction of the car from the end intersection in the x direction
@@ -268,10 +267,13 @@ void animateCarNew(int carNum)
                 startIndAve[carNum] = 1;
             if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
                 shortStopX[carNum] = 1;
+            if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == getStDir(car[carNum].endIntersection.Y) && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
+            {
+                shortStopY[carNum] = 1;
+                count[carNum] = 12;
+            }
         }
-        /*
-        If in the end col and the direction is wrong: move in row dir to next col
-        */
+        // If in the end col and the direction is wrong: move in row dir to next col
         else if(car[carNum].x == car[carNum].endPos.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0))
         {
             if(getStDir(car[carNum].y) == 1)
