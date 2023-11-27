@@ -67,6 +67,7 @@ int getStartAndEndCoordinates() {
         car[i].endQuad = mapInputToQuad(quadString);
     }
 
+    printf("\n");
     // clear the input buffer
     while((getchar()) != '\n');
 
