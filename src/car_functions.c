@@ -64,7 +64,6 @@ int getStartAndEndCoordinates() {
         scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
         printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
         scanf("%i%i%s", &car[i].endPos.X, &car[i].endPos.Y, &quadString);
-        car[i].endQuad = mapInputToQuad(quadString);
     }
 
     printf("\n");
@@ -77,7 +76,6 @@ int getStartAndEndCoordinates() {
     {
         car[i].x = tempCoord[i].X;
         car[i].y = tempCoord[i].Y;
-        car[i].startX = tempCoord[i].Y;
         calcIntersection(car[i].endPos.X, car[i].endPos.Y, i);
     }
     return numCars;
@@ -109,7 +107,6 @@ void updateEndCoordinates() {
         }
     printf("                                                                                         \
     \n                                                                                  "); // Clear the lines
-    car[numCar].endQuad = mapInputToQuad(quadString);
     car[numCar].endPos.X = SCALE_FACTOR*car[numCar].endPos.X+1;
     car[numCar].endPos.Y = SCALE_FACTOR*car[numCar].endPos.Y+1;
 

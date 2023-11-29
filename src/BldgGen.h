@@ -45,7 +45,7 @@ Building file structure:
 enum ST_DIR { East, West };
 enum AV_DIR { North, South };
 enum BLDG_TYPE { CHG, STB, BOTH};
-enum QUAD { NE, N, NW, E, LBL, W, SE, S, SW };
+enum QUAD { NE, N, NW, E, W, SE, S, SW };
 
 // Structure to define a building's properties
 struct bldg_data {
@@ -74,11 +74,18 @@ typedef struct {
     unsigned int x;     // x-position
     unsigned int y;     // y-position
     COORD endPos;       // Ending position
-    enum QUAD endQuad;  // Ending quadrant
     COORD endIntersection;
     unsigned char endIntersectionStatus;
-    unsigned int startX;
 } Car;
+
+// Structure to define a delivery request
+typedef struct {
+    int time;
+    char event;
+    char origin_customer_id[50];
+    char destination_customer_id[50];
+    float package_weight;
+} DeliveryRequest;
 
 // External declarations
 extern struct prompt bldg_t[];
@@ -109,3 +116,4 @@ extern void freeGrid(unsigned int ySize);
 
 // Global variables
 int maxCars;
+int time;

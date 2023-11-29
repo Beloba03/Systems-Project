@@ -11,6 +11,8 @@ and calls all of the other functions
 
 // Main function to demonstrate the building generator.
 int main(int argc, char *argv[]) {
+
+    time = 0; // CHANGE TO GET TIME FROM SAVE FILE
     
     // Check if the user has provided the correct number of arguments.
     if (argc != 2) {
@@ -51,6 +53,8 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < numCars; i++) {
             animateCarNew(i);
         }
+        
+        time++;
         Sleep(200);
     }
     // Set the cursor position to the bottom of the grid.
