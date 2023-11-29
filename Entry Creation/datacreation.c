@@ -10,65 +10,47 @@ typedef struct {
     float package_weight;
 } DeliveryRequest;
 
-int compare(const void *a, const void *b) {
-    DeliveryRequest *requestA = (DeliveryRequest *)a;
-    DeliveryRequest *requestB = (DeliveryRequest *)b;
-    return (requestA->time - requestB->time);
-}
-
 int main() {
-    DeliveryRequest requests[100]; // Assuming we won't have more than 100 requests for simplicity
-    int count = 0;
-    char input[10];
-    
+    DeliveryRequest request, header = {0, '0', "0", "0", 0.0}; // Header record
+    char input[10] = "yes";
+    FILE *file;
+
+    file = fopen("DeliveryRequests.dat", "r+b");
+    if (!file) {
+        file = fopen("DeliveryRequests.dat", "w+b");
+        if (!file) {
+            printf("Error opening file!\n");
+            return 1;
+        }
+        fwrite(&header, sizeof(DeliveryRequest), 1, file);
+    } else {
+        fread(&header, sizeof(DeliveryRequest), 1, file);
+    }
+
     printf("Delivery Request Entry Program\n");
-    while (1) {
-        printf("Enter a new delivery request? (yes/no): ");
-        scanf("%s", input);
-        
-        if (strcmp(input, "no") == 0) {
-            break;
-        }
-        
-        if (count >= 100) {
-            printf("Maximum number of requests reached.\n");
-            break;
-        }
-        
+
+    while (strcmp(input, "no") != 0) {
         printf("Enter time (integer): ");
-        scanf("%d", &requests[count].time);
-        requests[count].event = 'D'; // As per the given spec, the event is always 'D'
+        scanf("%d", &request.time);
+        request.event = 'D';
         
         printf("Enter origin customer ID: ");
-        scanf("%s", requests[count].origin_customer_id);
+        scanf("%s", request.origin_customer_id);
         
         printf("Enter destination customer ID: ");
-        scanf("%s", requests[count].destination_customer_id);
+        scanf("%s", request.destination_customer_id);
         
         printf("Enter package weight (kg): ");
-        scanf("%f", &requests[count].package_weight);
-        
-        count++;
+        scanf("%f", &request.package_weight);
+
+        fseek(file, 0, SEEK_END); // Move to the end of the file to append the new request
+        fwrite(&request, sizeof(DeliveryRequest), 1, file);
+
+        printf("Enter a new delivery request? (yes/no): ");
+        scanf("%s", input);
     }
-    
-    // Sort the requests by time
-    qsort(requests, count, sizeof(DeliveryRequest), compare);
-    
-    // Write to file
-    FILE *file = fopen("Events.txt", "w");
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-    
-    for (int i = 0; i < count; i++) {
-        fprintf(file, "%d\t%c\t%s\t%s\t%.2f\n", requests[i].time, requests[i].event, 
-                requests[i].origin_customer_id, requests[i].destination_customer_id, 
-                requests[i].package_weight);
-    }
-    
+
     fclose(file);
-    printf("Delivery requests saved to Events.txt\n");
-    
+    printf("Delivery requests updated in DeliveryRequests.dat\n");
     return 0;
 }

@@ -24,13 +24,14 @@ int main(int argc, char *argv[]) {
         getchar();      // Wait for a character input before exiting.
         return 1;       // Return an error code.
     }
-
+    setConsoleBufferSizeAndWindow(1000, 600, 80, 80); // Set buffer and window sizes.
+    hideCursor();
+    preventAutoScroll();
     // Read the data from the file and set up the city grid layout.
     read_file();
     
     // Prepare the console for the animation.
-    hideCursor();
-    setConsoleBufferSizeAndWindow(600, 600, 80, 80); // Set buffer and window sizes.
+    
 
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
@@ -50,6 +51,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < numCars; i++) {
             animateCarNew(i);
         }
+        Sleep(200);
     }
     // Set the cursor position to the bottom of the grid.
     setCursorPosition(0, SCALE_FACTOR*ybldg+7);

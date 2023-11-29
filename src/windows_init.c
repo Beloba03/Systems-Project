@@ -20,6 +20,22 @@ void hideCursor() {
     SetConsoleCursorInfo(hConsoleOutput, &cursorInfo);
 }
 
+// Function to prevent automatic scrolling to printed character
+void preventAutoScroll() {
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+    // Retrieve current console screen buffer information
+    if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+        // Adjust the scrolling rectangle (modify as needed)
+        csbi.srWindow.Bottom -= 1; // Example adjustment
+        csbi.srWindow.Top -= 1;    // Example adjustment
+
+        // Set the adjusted view window
+        SetConsoleWindowInfo(hConsole, TRUE, &csbi.srWindow);
+    }
+}
+
 // Function to set the console's buffer and window sizes to allow for maps larger than the screen
 void setConsoleBufferSizeAndWindow(short xBuffer, short yBuffer, short xWindow, short yWindow) {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

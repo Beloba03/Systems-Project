@@ -214,6 +214,9 @@ int greaterOrLess(int pos1, int pos2)
         return 0;
 
 }
+
+// 4 car test input: 1 1 55 32 S 7 9 19 19 S 23 19 49 49 S 25 23 3 7 S
+
 // This function animates the car's movement between current location and end intersection
 void animateCarNew(int carNum)
 {
@@ -386,9 +389,9 @@ void animateCarNew(int carNum)
         {
             car[carNum].endIntersectionStatus = 1;
         }
-    Sleep(200);
 }
 
+// This function calculates the best intersection for the car to navigate to to reach its end point.
 void calcIntersection(int x, int y, int carNum)
 {
     if((x-1)%6 == 0) // On an avenue
