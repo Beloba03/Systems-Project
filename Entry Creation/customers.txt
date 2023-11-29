@@ -1,0 +1,5 @@
+Customer-ID First-Name  Last-Name   Building    Entrance    Floor
+1           John        Doe         AA           N           1
+2           Jane        Doe         AC           S           3
+3           Fred        Down        DD           NE          4
+6           Alfred        Johnson         KA           N           100

@@ -22,6 +22,8 @@ Building file structure:
 #include <stdlib.h>
 #include <string.h>
 #include <io.h>
+#include <Windows.h>
+#include "car_header.h"
 
 #define TRUNCATE(name)	name[strlen(name)-1] = '\0'  // Macro to truncate last character of a string
 #define NAMELEN	16	/* Maximum length for filename */
@@ -40,13 +42,7 @@ Building file structure:
 #define BUILDING_OFFSET 2
 #define LAST_STREET_OFFSET 3
 
-#include "car_header.h"
-
-// Enumerations for defining directions and building types
-enum ST_DIR { East, West };
-enum AV_DIR { North, South };
-enum BLDG_TYPE { CHG, STB, BOTH};
-enum QUAD { NE, N, NW, E, W, SE, S, SW };
+#include "directional_enums.h"
 
 // Structure to define a building's properties
 struct bldg_data {
@@ -63,16 +59,6 @@ struct prompt {
 };
 
 
-
-// Structure to define a delivery request
-typedef struct {
-    int time;
-    char event;
-    char origin_customer_id[50];
-    char destination_customer_id[50];
-    float package_weight;
-} DeliveryRequest;
-
 // External declarations
 extern struct prompt bldg_t[];
 extern struct prompt ew[];
@@ -82,8 +68,8 @@ extern char** cityGrid;
 extern COORD startOffset;
 extern unsigned int ybldg;
 extern unsigned int xbldg;
-extern Car *car;
 extern int numCars;
+extern Car *car;
 
 // File pointer for the building data file
 FILE* bfd;
@@ -99,8 +85,8 @@ extern void updateEndCoordinates();
 //extern void animateCar(int carNum);
 extern void animateCarNew(int carNum);
 extern void freeGrid(unsigned int ySize);
-location dequeue(int carNum);
+extern int sortEvents();
+extern void checkForEvents();
+extern int convCustToRel();
 
-// Global variables
-int maxCars;
-int time;
+

@@ -172,7 +172,7 @@ void read_file() {
 
     // Initialize the city grid based on the read dimensions
     initializeGrid(xbldg, ybldg);
-    numCars = getStartAndEndCoordinates();
+    numCars = 4;
     
     // Read building data and set up the city grid
     fread(&bd, sizeof(struct bldg_data), 1, bfd);

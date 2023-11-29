@@ -8,7 +8,7 @@ and calls all of the other functions
 
 // Include the building generator header.
 #include "BldgGen.h"
-
+int time = 0;
 // Main function to demonstrate the building generator.
 int main(int argc, char *argv[]) {
 
@@ -29,10 +29,11 @@ int main(int argc, char *argv[]) {
     // Prepare the console for the animation.
     setConsoleBufferSizeAndWindow(1000, 600, 80, 80); // Set buffer and window sizes.
     hideCursor();
+    staticCarNum();
 
 
 
-    preventAutoScroll(); // HASN'T BEEN IMPLEMENTED YET
+    //preventAutoScroll(); // HASN'T BEEN IMPLEMENTED YET
 
 
     for(int i = 0; i < MAX_CAR_NUM; i++)
@@ -40,6 +41,8 @@ int main(int argc, char *argv[]) {
         car[i].locQueue.next = NULL;
         car[i].currentLoc = &car[i].locQueue;
     }
+    sortEvents();
+    convCustToRel();
     // Read the data from the file and set up the city grid layout.
     read_file();
 
@@ -48,16 +51,6 @@ int main(int argc, char *argv[]) {
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
-        // Check if the 'D' key is pressed.
-        int isDKeyPressed = GetAsyncKeyState('D') & 0x8000;
-
-        // If the 'D' key was just pressed, update the car's destination coordinates.
-        if (isDKeyPressed && !wasDKeyPressed) {
-            updateEndCoordinates();
-        }
-
-        // Update the state of the 'D' key for the next iteration.
-        wasDKeyPressed = isDKeyPressed;
 
         // Animate each car on the grid.
         for (int i = 1; i <= numCars; i++) {

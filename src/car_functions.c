@@ -6,9 +6,9 @@ This module contains functions relating to the car's initialization ,movement, a
 */
 
 #include "BldgGen.h"
+#include "car_header.h"
 #define DEBUG // Comment this out to remove debug information
 //#define MANUAL_ENTRY // Comment this out to remove manual entry of car's start and end coordinates
-unsigned int trigger = 0; // This is used to select which car to update the end position of
 
 // Declare a car variable array
 Car *car;
@@ -85,6 +85,12 @@ int getStartAndEndCoordinates() {
     
 }
 #endif
+
+int staticCarNum()
+{
+    int numCars = 4;
+    car = (Car*)malloc(numCars * sizeof(Car)+1);
+}
 
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection, int carNum) {
@@ -392,5 +398,5 @@ void calcIntersection(int x, int y, int carNum)
 
 void moveToEntrance(int carNum)
 {
-
+    return;
 }
