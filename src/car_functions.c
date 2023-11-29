@@ -7,6 +7,7 @@ This module contains functions relating to the car's initialization ,movement, a
 
 #include "BldgGen.h"
 #define DEBUG // Comment this out to remove debug information
+//#define MANUAL_ENTRY // Comment this out to remove manual entry of car's start and end coordinates
 unsigned int trigger = 0; // This is used to select which car to update the end position of
 
 // Declare a car variable array
@@ -47,10 +48,11 @@ enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
     }
 }
 
-
+#ifdef MANUAL_ENTRY
 // Gets the start and end coordinates for the cars from the user
 int getStartAndEndCoordinates() {
     int numCars;
+    COORD endPos;
     char quadString[MAX_QUAD_LENGTH];
     printf("How many AEDVs would you like to create?: ");
     scanf("%i", &numCars);
@@ -63,7 +65,7 @@ int getStartAndEndCoordinates() {
         printf("Enter the X, Y coordinate for the starting point for car %i: ", i);
         scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
         printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
-        scanf("%i%i%s", &car[i].endPos.X, &car[i].endPos.Y, &quadString);
+        scanf("%i%i%s", &endPos.X, &endPos.Y, &quadString);
     }
 
     printf("\n");
@@ -76,43 +78,12 @@ int getStartAndEndCoordinates() {
     {
         car[i].x = tempCoord[i].X;
         car[i].y = tempCoord[i].Y;
-        calcIntersection(car[i].endPos.X, car[i].endPos.Y, i);
+        calcIntersection(endPos.X, endPos.Y, i);
     }
     return numCars;
     
 }
-
-// Update the end coordinates for a car
-void updateEndCoordinates() {
-    int numCar;
-    COORD tempCord = getCursorPosition();
-    setCursorPosition(0, SCALE_FACTOR*ybldg+UPDATE_INPUT_OFFSET);
-    printf("Enter the car num you would like to change: ");
-    scanf("%i", &numCar);
-    char quadString[MAX_QUAD_LENGTH];
-    printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", numCar);    
-    scanf("%i%i%s", &car[numCar].endPos.X, &car[numCar].endPos.Y, &quadString);
-    setCursorPosition(0, SCALE_FACTOR*ybldg+UPDATE_INPUT_OFFSET);
-    if(car[numCar].endPos.X > xbldg || car[numCar].endPos.Y > ybldg) // Check if the user entered a valid coordinate (too high)
-        {
-            printf("Invalid coordinate entered, defaulting to max                                      \n");
-            car[numCar].endPos.X = xbldg;
-            car[numCar].endPos.Y = ybldg;
-        }
-    if(car[numCar].endPos.X  < 1 && car[numCar].endPos.Y < 1) // Check if the user entered a valid coordinate (too low)
-        {
-            printf("Invalid coordinate entered, defaulting to min                                      \n");
-            car[numCar].endPos.X = 1;
-            car[numCar].endPos.Y = 1;
-        }
-    printf("                                                                                         \
-    \n                                                                                  "); // Clear the lines
-    car[numCar].endPos.X = SCALE_FACTOR*car[numCar].endPos.X+1;
-    car[numCar].endPos.Y = SCALE_FACTOR*car[numCar].endPos.Y+1;
-
-    setCursorPosition(tempCord.X, tempCord.Y);
-    trigger = numCar+1;
-}
+#endif
 
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection, int carNum) {
@@ -416,4 +387,9 @@ void calcIntersection(int x, int y, int carNum)
     }
     car[carNum].endIntersection.X = x;
     car[carNum].endIntersection.Y = y;
+}
+
+void moveToEntrance(int carNum)
+{
+
 }

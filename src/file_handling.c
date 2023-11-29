@@ -17,7 +17,6 @@ void checkForRequests() {
             int i = 0;
             while(car[i].endIntersectionStatus == 2)
             {
-
                 i++;
             }
         }

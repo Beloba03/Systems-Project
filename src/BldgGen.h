@@ -69,14 +69,22 @@ typedef enum {
     MOVE_LEFT
 } CarDirection;
 
+// Structure to define a coordinate
+typedef struct {
+    COORD endPos;
+    CarDirection endDir;
+} location;
+
 // Structure to define properties of a car in the city grid
 typedef struct {
     unsigned int x;     // x-position
     unsigned int y;     // y-position
-    COORD endPos;       // Ending position
+    location *locQueue; // Queue of locations to move to
     COORD endIntersection;
     unsigned char endIntersectionStatus;
 } Car;
+
+
 
 // Structure to define a delivery request
 typedef struct {
