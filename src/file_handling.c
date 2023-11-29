@@ -26,12 +26,9 @@ void checkForRequests() {
     fclose(file);
 }
 
-int checkDistToEnd(int x, int y)
-{
-    
-}
 
-COORD moveInDirection(char x, char y, enum QUAD direction) {
+
+COORD getCoord(char x, char y, enum QUAD direction) {
     COORD newCoord;
     
     // Map input coordinates AA, AB, AC, etc., to actual values
