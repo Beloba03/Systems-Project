@@ -35,6 +35,11 @@ int main(int argc, char *argv[]) {
     preventAutoScroll(); // HASN'T BEEN IMPLEMENTED YET
 
 
+    for(int i = 0; i < MAX_CAR_NUM; i++)
+    {
+        car[i].locQueue.next = NULL;
+        car[i].currentLoc = &car[i].locQueue;
+    }
     // Read the data from the file and set up the city grid layout.
     read_file();
 

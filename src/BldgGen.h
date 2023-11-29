@@ -18,7 +18,6 @@ Building file structure:
 #define _CRT_SECURE_NO_WARNINGS
 
 // Header files
-#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +40,8 @@ Building file structure:
 #define BUILDING_OFFSET 2
 #define LAST_STREET_OFFSET 3
 
+#include "car_header.h"
+
 // Enumerations for defining directions and building types
 enum ST_DIR { East, West };
 enum AV_DIR { North, South };
@@ -60,29 +61,6 @@ struct prompt {
     char* name;   // Name or response string
     int code;     // Associated enumeration value
 };
-
-// Enumeration to define possible car directions
-typedef enum {
-    MOVE_UP,
-    MOVE_RIGHT,
-    MOVE_DOWN,
-    MOVE_LEFT
-} CarDirection;
-
-// Structure to define a coordinate
-typedef struct {
-    COORD endPos;
-    CarDirection endDir;
-} location;
-
-// Structure to define properties of a car in the city grid
-typedef struct {
-    unsigned int x;     // x-position
-    unsigned int y;     // y-position
-    location *locQueue; // Queue of locations to move to
-    COORD endIntersection;
-    unsigned char endIntersectionStatus;
-} Car;
 
 
 
@@ -121,6 +99,7 @@ extern void updateEndCoordinates();
 //extern void animateCar(int carNum);
 extern void animateCarNew(int carNum);
 extern void freeGrid(unsigned int ySize);
+location dequeue(int carNum);
 
 // Global variables
 int maxCars;

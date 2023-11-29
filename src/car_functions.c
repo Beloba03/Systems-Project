@@ -22,6 +22,7 @@ int isSpaceFree(int x, int y) {
 }
 
 // Function to map integer to QUAD enum
+
 enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
     if(strcmp(quadString, "N") == 0)
         return N;
@@ -234,7 +235,7 @@ void animateCarNew(int carNum)
             else if(dir == -1)
                 updateCar(MOVE_LEFT, carNum);
             startInd[carNum] = 1;
-            if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endPos.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
+            if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endIntersection.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
                 startIndAve[carNum] = 1;
             if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
                 shortStopX[carNum] = 1;
@@ -245,7 +246,7 @@ void animateCarNew(int carNum)
             }
         }
         // If in the end col and the direction is wrong: move in row dir to next col
-        else if(car[carNum].x == car[carNum].endPos.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0))
+        else if(car[carNum].x == car[carNum].endIntersection.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0))
         {
             if(getStDir(car[carNum].y) == 1)
                 updateCar(MOVE_RIGHT, carNum);
