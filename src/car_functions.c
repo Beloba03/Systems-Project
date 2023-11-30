@@ -8,7 +8,7 @@ This module contains functions relating to the car's initialization ,movement, a
 #include "BldgGen.h"
 #include "car_header.h"
 #define DEBUG // Comment this out to remove debug information
-//#define MANUAL_ENTRY // Comment this out to remove manual entry of car's start and end coordinates
+#define MANUAL_ENTRY // Comment this out to remove manual entry of car's start and end coordinates
 
 // Declare a car variable array
 Car *car;
@@ -52,6 +52,7 @@ enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
 #ifdef MANUAL_ENTRY
 // Gets the start and end coordinates for the cars from the user
 int getStartAndEndCoordinates() {
+    int maxCars;
     int numCars;
     COORD endPos;
     char quadString[MAX_QUAD_LENGTH];
@@ -84,13 +85,20 @@ int getStartAndEndCoordinates() {
     return numCars;
     
 }
-#endif
-
-int staticCarNum()
+#else
+void staticCarNum()
 {
-    int numCars = 4;
+    int numCars = 1;
     car = (Car*)malloc(numCars * sizeof(Car)+1);
+    car[0].endIntersectionStatus = 0;
+    if(car == NULL)
+    {
+        printf("Error allocating memory for car array");
+        exit(EXIT_FAILURE);
+    }
+    return;
 }
+#endif
 
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection, int carNum) {
@@ -241,7 +249,7 @@ void animateCarNew(int carNum)
             else if(dir == -1)
                 updateCar(MOVE_LEFT, carNum);
             startInd[carNum] = 1;
-            if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endIntersection.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
+            if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endPos.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
                 startIndAve[carNum] = 1;
             if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
                 shortStopX[carNum] = 1;
@@ -252,7 +260,7 @@ void animateCarNew(int carNum)
             }
         }
         // If in the end col and the direction is wrong: move in row dir to next col
-        else if(car[carNum].x == car[carNum].endIntersection.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0))
+       else if(car[carNum].x == car[carNum].endPos.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endPos.Y) && getAvDir(car[carNum].x) != 0))
         {
             if(getStDir(car[carNum].y) == 1)
                 updateCar(MOVE_RIGHT, carNum);

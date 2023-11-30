@@ -8,25 +8,6 @@ Set that cars destination to the pickup location then delivery location.
 
 char *delimiter = ",\t\n ";
 
-void checkForEvents() {
-    DeliveryRequest request;
-    FILE *file = fopen("DeliveryRequests.dat", "rb");
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return;
-    }
-    while(fread(&request, sizeof(DeliveryRequest), 1, file)) {
-        if (request.time == time) {
-            int i = 0;
-            while(car[i].endIntersectionStatus == 2)
-            {
-                i++;
-            }
-        }
-    }
-
-    fclose(file);
-}
 
 
 
@@ -173,7 +154,7 @@ int convCustToRel() {
     return 0;
 }
 
-COORD getCustDest(int custID) {
+COORD getCustDest(int custID, int quadOveride) {
     FILE *file = fopen("Customers.dat", "rb");
     if (file == NULL) {
         printf("Error opening file!\n");
@@ -261,6 +242,41 @@ int sortEvents() {
     fclose(inFile);
     fclose(outFile);
     return 0;
+}
+
+void setCarDest(int carNum)
+{
+    FILE *file = fopen("events_sorted.txt", "r");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    EventRecord record;
+    char line[MAX_LINE_LENGTH];
+    while(fgets(line, MAX_LINE_LENGTH, file)) {
+        char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
+        if (token) record.time = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        if (token) record.event = token[0];
+
+        token = strtok(NULL, delimiter);
+        if (token) record.origin_customer_id = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        if (token) record.destination_customer_id = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        if (token) record.package_weight = atof(token);
+
+        COORD start = getCustDest(record.origin_customer_id, 1);
+        car[carNum].x = start.X;
+        car[carNum].y = start.Y;
+        car[carNum].endPos = getCustDest(record.destination_customer_id, 0);
+        int endX = car[carNum].endPos.X, endY = car[carNum].endPos.Y, curx = car[carNum].x, cury = car[carNum].y;
+        int k = 0;
+    }
+    calcIntersection(car[carNum].endPos.X, car[carNum].endPos.Y, carNum);
 }
 
 

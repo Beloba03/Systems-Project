@@ -1,5 +1,0 @@
-Time    Event  Origin-Customer  Dest-Customer    Package-Weight
-100     D       1               3                22               
-177     D       4               8                98
-76      D       2               5                12
-23      D       8               4                22

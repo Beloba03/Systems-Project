@@ -29,14 +29,15 @@ int main(int argc, char *argv[]) {
     // Prepare the console for the animation.
     setConsoleBufferSizeAndWindow(1000, 600, 80, 80); // Set buffer and window sizes.
     hideCursor();
-    staticCarNum();
+    //staticCarNum();
+    getStartAndEndCoordinates();
 
 
 
     //preventAutoScroll(); // HASN'T BEEN IMPLEMENTED YET
 
 
-    for(int i = 0; i < MAX_CAR_NUM; i++)
+    for(int i = 0; i < numCars; i++)
     {
         car[i].locQueue.next = NULL;
         car[i].currentLoc = &car[i].locQueue;
@@ -50,10 +51,12 @@ int main(int argc, char *argv[]) {
 
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
+    setCarDest(0);
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
 
         // Animate each car on the grid.
-        for (int i = 1; i <= numCars; i++) {
+        for (int i = 0; i < numCars; i++) {
+            int endIX = car[i].endIntersection.X, endIY = car[i].endIntersection.Y, endX = car[i].endPos.X, endY = car[i].endPos.Y, curx = car[i].x, cury = car[i].y;
             animateCarNew(i);
         }
         

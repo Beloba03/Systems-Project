@@ -9,9 +9,9 @@ This module contains functions relating to reading and creating the map
 
 // Declaration of a 2D character array for city grid layout
 char** cityGrid;
-COORD startOffset;
+COORD startOffset = {0, 0};
 unsigned int xbldg, ybldg, s1dir, a1dir;
-int numCars;
+int numCars = 1;
 struct bldg_data bd;  // Declare a building data structure
 
 // This converts the quadrant to a string
@@ -172,7 +172,6 @@ void read_file() {
 
     // Initialize the city grid based on the read dimensions
     initializeGrid(xbldg, ybldg);
-    numCars = 4;
     
     // Read building data and set up the city grid
     fread(&bd, sizeof(struct bldg_data), 1, bfd);
