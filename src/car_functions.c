@@ -102,9 +102,21 @@ void staticCarNum()
 
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection, int carNum) {
-    COORD prevPos = (COORD){car[carNum].x, car[carNum].y+startOffset.Y};  // Store the previous position (before updating)
-    int attempts = 4; // There are 4 directions. The car will attempt to find a free space in each direction.
+    COORD prevPos = {car[carNum].x, car[carNum].y + startOffset.Y};  // Store the previous position
 
+    // Define the LOW_CHARGE_THRESHOLD based on your requirements
+    float LOW_CHARGE_THRESHOLD = 20.0; // Adjust this value as needed
+
+    // Check if the car's charge is low and it's not already charging
+    if (car[carNum].charge <= LOW_CHARGE_THRESHOLD && !car[carNum].isCharging) {
+        // Find the nearest charging station
+        COORD chargingStation = findNearestChargingStation(car[carNum].x, car[carNum].y);
+        // Set the car's destination to the charging station
+        // This requires modifying the car's destination or path logic
+        car[carNum].isCharging = 1; // Mark the car as going to charge
+    }
+
+    int attempts = 4; // There are 4 directions. The car will attempt to find a free space in each direction.
     while (attempts > 0) {
         // Check if the car is idle or moving
         if (car[carNum].isIdle) {
@@ -118,6 +130,7 @@ void updateCar(CarDirection carDirection, int carNum) {
             car[carNum].charge -= PACKAGE_CONSUMPTION_RATE * car[carNum].carriedWeight;
         }
 
+        // Logic to move the car based on the current direction
         switch (carDirection) {
             case MOVE_UP:
                 if (isSpaceFree(car[carNum].x, car[carNum].y - 1)) {
@@ -157,23 +170,23 @@ void updateCar(CarDirection carDirection, int carNum) {
                 break;
         }
 
-        // Check if charge is below a threshold to trigger charging
-        if (car[carNum].charge <= (MAX_CARRY_WEIGHT * PACKAGE_CONSUMPTION_RATE) && !car[carNum].isCharging) {
-            car[carNum].isCharging = 1; // Start charging
-        }
-
-        // Recharge the car if it's at a charging station
-        if (car[carNum].isCharging) {
-            rechargeCar(carNum);
+        // Check if the car is at a charging station and recharge if needed
+        if (car[carNum].isCharging && cityGrid[car[carNum].y][car[carNum].x] == 'C') {
+            car[carNum].charge += CHARGING_RATE;
+            if (car[carNum].charge >= MAX_CHARGE) {
+                car[carNum].charge = MAX_CHARGE;
+                car[carNum].isCharging = 0; // Car is fully charged
+                // Set the car's next destination or task here
+            }
         }
     }
 
+    // Set cursor position and print car number
     setCursorPosition(prevPos.X, prevPos.Y);  // Move cursor to previous position
     printf(" "); // Clear the previous position
-    setCursorPosition(car[carNum].x, car[carNum].y+startOffset.Y);  // Update for new position
+    setCursorPosition(car[carNum].x, car[carNum].y + startOffset.Y);  // Update for new position
     printf("%i", carNum);
 }
-
 
 
 // Debug information for the car's movement
@@ -436,8 +449,31 @@ void moveToEntrance(int carNum)
 // Assuming this is where you initialize each car
 void initializeCars() {
     for (int i = 0; i < numCars; i++) {
+        car[i].isIdle = 1;   // Set the car to be idle
         car[i].charge = INITIAL_CHARGE; // Set the initial charge
         car[i].carriedWeight = 0;       // Initially, the car is not carrying any cargo
         car[i].isCharging = 0;          // Initially, the car is not charging
     }
+}
+
+// Function to find the nearest charging station
+COORD findNearestChargingStation(int carX, int carY) {
+    COORD nearestStation = {0, 0};
+    // Initialize variables to store the minimum distance and its coordinates
+    int minDistance = INT_MAX;
+
+    for (int y = 0; y < SCALE_FACTOR * ybldg + LAST_STREET_OFFSET; y++) {
+        for (int x = 0; x < SCALE_FACTOR * xbldg + LAST_STREET_OFFSET; x++) {
+            if (cityGrid[y][x] == 'C') {
+                int distance = abs(carX - x) + abs(carY - y); // Calculate Manhattan distance
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestStation.X = x;
+                    nearestStation.Y = y;
+                }
+            }
+        }
+    }
+
+    return nearestStation;
 }

@@ -42,5 +42,6 @@ typedef struct {
     unsigned char endIntersectionStatus;
     float charge;      // Current charge in kWh
     unsigned int carriedWeight; // Weight of the cargo in kilograms
+    int isIdle; // 1 if idle, 0 if not idle
     int isCharging; // 1 if charging, 0 if not charging
 } Car;

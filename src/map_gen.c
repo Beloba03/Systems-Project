@@ -209,3 +209,5 @@ void freeGrid(unsigned int ySize) {
     free(cityGrid);
     free(car);
 }
+
+
