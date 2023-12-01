@@ -5,6 +5,7 @@ Set that cars destination to the pickup location then delivery location.
 
 #include "car_header.h"
 #include "file_handling_header.h"
+#include "linked_list_header.h"
 
 char *delimiter = ",\t\n ";
 
@@ -21,14 +22,14 @@ COORD getCoord(char x, char y, enum QUAD direction) {
     // Apply direction to the mapped coordinates
     switch (direction) {
         case NE: 
-            newCoord.X += BUILDING_OFFSET; 
+            newCoord.X += 1; 
             newCoord.Y -= BUILDING_OFFSET; 
             break;
         case N:  
             newCoord.Y -= BUILDING_OFFSET; 
             break;
         case NW: 
-            newCoord.X -= BUILDING_OFFSET; 
+            newCoord.X -= 1; 
             newCoord.Y -= BUILDING_OFFSET; 
             break;
         case E:  
@@ -38,14 +39,14 @@ COORD getCoord(char x, char y, enum QUAD direction) {
             newCoord.X -= BUILDING_OFFSET; 
             break;
         case SE: 
-            newCoord.X += BUILDING_OFFSET; 
+            newCoord.X += 1; 
             newCoord.Y += BUILDING_OFFSET; 
             break;
         case S:  
             newCoord.Y += BUILDING_OFFSET; 
             break;
         case SW: 
-            newCoord.X -= BUILDING_OFFSET; 
+            newCoord.X -= 1; 
             newCoord.Y += BUILDING_OFFSET; 
             break;
         default: // Should never happen
@@ -56,7 +57,6 @@ COORD getCoord(char x, char y, enum QUAD direction) {
 
     return newCoord;
 }
-
 
 
 
@@ -153,9 +153,23 @@ int convCustToRel() {
 
     return 0;
 }
-
-COORD getCustDest(int custID, int quadOveride) {
+CarDirection getEndDirection(enum QUAD endQuad)
+{
+    switch(endQuad)
+    {
+        case(N): return MOVE_DOWN;
+        case(E): return MOVE_LEFT;
+        case(S): return MOVE_UP;
+        case(W): return MOVE_RIGHT;
+        case(NE): return MOVE_DOWN;
+        case(NW): return MOVE_DOWN;
+        case(SE): return MOVE_UP;
+        case(SW): return MOVE_UP;
+    }
+}
+location getCustDest(int custID) {
     FILE *file = fopen("Customers.dat", "rb");
+    location retVal;
     if (file == NULL) {
         printf("Error opening file!\n");
         return;
@@ -164,7 +178,10 @@ COORD getCustDest(int custID, int quadOveride) {
     fseek(file, sizeof(Customer) * (custID - 1), SEEK_SET);
     fread(&customer, sizeof(Customer), 1, file);
     fclose(file);
-    return getCoord(customer.building[0], customer.building[1], customer.entrance);
+    retVal.endPos = getCoord(customer.building[0], customer.building[1], customer.entrance);
+    retVal.endDir = getEndDirection(customer.entrance);
+    retVal.floorNum = customer.floor;
+    return retVal;
 }
 
 typedef struct {
@@ -202,6 +219,7 @@ int sortEvents() {
         numEntries++;
     }
     rewind(inFile);
+
 
     EventRecord records[numEntries];
     int recordCount = 0;
@@ -253,6 +271,7 @@ void setCarDest(int carNum)
     }
     EventRecord record;
     char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file); // Skip header line
     while(fgets(line, MAX_LINE_LENGTH, file)) {
         char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
         if (token) record.time = atoi(token);
@@ -268,15 +287,11 @@ void setCarDest(int carNum)
 
         token = strtok(NULL, delimiter);
         if (token) record.package_weight = atof(token);
+        enqueue(carNum, getCustDest(record.origin_customer_id)); // Add pickup location
+        enqueue(carNum, getCustDest(record.destination_customer_id)); // Add delivery location
 
-        COORD start = getCustDest(record.origin_customer_id, 1);
-        car[carNum].x = start.X;
-        car[carNum].y = start.Y;
-        car[carNum].endPos = getCustDest(record.destination_customer_id, 0);
-        int endX = car[carNum].endPos.X, endY = car[carNum].endPos.Y, curx = car[carNum].x, cury = car[carNum].y;
-        int k = 0;
     }
-    calcIntersection(car[carNum].endPos.X, car[carNum].endPos.Y, carNum);
+   
 }
 
 

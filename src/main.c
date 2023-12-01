@@ -8,11 +8,12 @@ and calls all of the other functions
 
 // Include the building generator header.
 #include "BldgGen.h"
-int time = 0;
+#include "linked_list_header.h"
+int tickTime = 0;
 // Main function to demonstrate the building generator.
 int main(int argc, char *argv[]) {
 
-    time = 0; // CHANGE TO GET TIME FROM SAVE FILE
+    tickTime = 0; // CHANGE TO GET TIME FROM SAVE FILE
     
     // Check if the user has provided the correct number of arguments.
     if (argc != 2) {
@@ -26,11 +27,27 @@ int main(int argc, char *argv[]) {
         getchar();      // Wait for a character input before exiting.
         return 1;       // Return an error code.
     }
+
+     // Read the data from the file and set up the city grid layout.
+    read_file();
     // Prepare the console for the animation.
     setConsoleBufferSizeAndWindow(1000, 600, 80, 80); // Set buffer and window sizes.
     hideCursor();
-    //staticCarNum();
-    getStartAndEndCoordinates();
+    staticCarNum();
+    sortEvents();
+    convCustToRel();
+    setCarDest(0);
+
+    // First request
+    printQueue(0);
+    location req1 = dequeue(0);
+    car[0].x = req1.endPos.X;
+    car[0].y = req1.endPos.Y;
+    location req2 = dequeue(0);
+    car[0].endPos.X = req2.endPos.X;
+    car[0].endPos.Y = req2.endPos.Y;
+    car[0].endDirection = req2.endDir;
+    calcIntersection(req2.endPos.X, req2.endPos.Y, 0);
 
 
 
@@ -42,16 +59,13 @@ int main(int argc, char *argv[]) {
         car[i].locQueue.next = NULL;
         car[i].currentLoc = &car[i].locQueue;
     }
-    sortEvents();
-    convCustToRel();
-    // Read the data from the file and set up the city grid layout.
-    read_file();
+   
 
     
 
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
-    setCarDest(0);
+    
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
 
         // Animate each car on the grid.
@@ -60,7 +74,7 @@ int main(int argc, char *argv[]) {
             animateCarNew(i);
         }
         
-        time++;
+        tickTime++;
         Sleep(200);
     }
     // Set the cursor position to the bottom of the grid.

@@ -1,24 +1,9 @@
 #pragma once
 #include <Windows.h>
-// Enumeration to define possible car directions
-typedef enum CarDirection{
-    MOVE_UP,
-    MOVE_RIGHT,
-    MOVE_DOWN,
-    MOVE_LEFT
-} CarDirection;
+#include "linked_list_header.h"
+#include <time.h>
 
-// Structure to define a location
-typedef struct location {
-    COORD endPos;
-    CarDirection endDir;
-} location;
 
-typedef struct LinkedList
-{
-    location loc;
-    struct LinkedList *next;
-} LinkedList;
 
 // Structure to define properties of a car in the city grid
 typedef struct {
@@ -29,4 +14,5 @@ typedef struct {
     COORD endIntersection;
     COORD endPos;
     unsigned char endIntersectionStatus;
+    CarDirection endDirection;
 } Car;

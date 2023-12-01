@@ -8,7 +8,9 @@
 	"settings": {
 		"files.associations": {
 			"*.c2": "c",
-			"bldggen.h": "c"
+			"bldggen.h": "c",
+			"linked_list_header.h": "c",
+			"windows.h": "c"
 		}
 	}
 }
