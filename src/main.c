@@ -52,13 +52,6 @@ int main(int argc, char *argv[]) {
 
 
     //preventAutoScroll(); // HASN'T BEEN IMPLEMENTED YET
-
-
-    for(int i = 0; i < numCars; i++)
-    {
-        car[i].locQueue.next = NULL;
-        car[i].currentLoc = &car[i].locQueue;
-    }
    
 
     
@@ -75,7 +68,7 @@ int main(int argc, char *argv[]) {
         }
         
         tickTime++;
-        Sleep(200);
+        Sleep(20);
     }
     // Set the cursor position to the bottom of the grid.
     setCursorPosition(0, SCALE_FACTOR*ybldg+7);
