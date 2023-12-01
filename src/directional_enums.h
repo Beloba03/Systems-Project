@@ -1,3 +1,5 @@
+//directional_enums.h
+
 #pragma once
 
 // Enumerations for defining directions and building types

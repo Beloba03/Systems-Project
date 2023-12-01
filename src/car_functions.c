@@ -1,4 +1,4 @@
-/*
+/*car_functions.c
 Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
 November 3, 2023
 
@@ -106,6 +106,18 @@ void updateCar(CarDirection carDirection, int carNum) {
     int attempts = 4; // There are 4 directions. The car will attempt to find a free space in each direction.
 
     while (attempts > 0) {
+        // Check if the car is idle or moving
+        if (car[carNum].isIdle) {
+            // Car is idle, consume energy at idle rate
+            car[carNum].charge -= IDLE_CONSUMPTION_RATE;
+        } else {
+            // Car is moving, consume energy at movement rate
+            car[carNum].charge -= MOVEMENT_CONSUMPTION_RATE;
+
+            // Additional charge consumed by carried packages
+            car[carNum].charge -= PACKAGE_CONSUMPTION_RATE * car[carNum].carriedWeight;
+        }
+
         switch (carDirection) {
             case MOVE_UP:
                 if (isSpaceFree(car[carNum].x, car[carNum].y - 1)) {
@@ -144,6 +156,16 @@ void updateCar(CarDirection carDirection, int carNum) {
                 }
                 break;
         }
+
+        // Check if charge is below a threshold to trigger charging
+        if (car[carNum].charge <= (MAX_CARRY_WEIGHT * PACKAGE_CONSUMPTION_RATE) && !car[carNum].isCharging) {
+            car[carNum].isCharging = 1; // Start charging
+        }
+
+        // Recharge the car if it's at a charging station
+        if (car[carNum].isCharging) {
+            rechargeCar(carNum);
+        }
     }
 
     setCursorPosition(prevPos.X, prevPos.Y);  // Move cursor to previous position
@@ -151,6 +173,8 @@ void updateCar(CarDirection carDirection, int carNum) {
     setCursorPosition(car[carNum].x, car[carNum].y+startOffset.Y);  // Update for new position
     printf("%i", carNum);
 }
+
+
 
 // Debug information for the car's movement
 #ifdef DEBUG
@@ -407,4 +431,13 @@ void calcIntersection(int x, int y, int carNum)
 void moveToEntrance(int carNum)
 {
     return;
+}
+
+// Assuming this is where you initialize each car
+void initializeCars() {
+    for (int i = 0; i < numCars; i++) {
+        car[i].charge = INITIAL_CHARGE; // Set the initial charge
+        car[i].carriedWeight = 0;       // Initially, the car is not carrying any cargo
+        car[i].isCharging = 0;          // Initially, the car is not charging
+    }
 }

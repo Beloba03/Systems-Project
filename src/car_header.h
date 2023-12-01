@@ -1,3 +1,14 @@
+//car_header.h
+
+#define IDLE_CONSUMPTION_RATE 0.001   // kWh per tick for idle mode
+#define MOVEMENT_CONSUMPTION_RATE 0.1 // kWh per tick when moving
+#define PACKAGE_CONSUMPTION_RATE 0.0001 // kWh per tick per kilogram
+#define MAX_CARRY_WEIGHT 2000 // Maximum weight in kilograms
+#define INITIAL_CHARGE 100.0 // Initial charge level for cars
+#define CHARGING_RATE 0.5   // kWh per tick while charging
+#define MAX_CHARGE 100.0     // Maximum charge capacity for cars
+
+
 #pragma once
 #include <Windows.h>
 // Enumeration to define possible car directions
@@ -29,4 +40,7 @@ typedef struct {
     COORD endIntersection;
     COORD endPos;
     unsigned char endIntersectionStatus;
+    float charge;      // Current charge in kWh
+    unsigned int carriedWeight; // Weight of the cargo in kilograms
+    int isCharging; // 1 if charging, 0 if not charging
 } Car;

@@ -1,5 +1,5 @@
 
-/*
+/*BldgGen.h
 Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
 November 3, 2023
 
