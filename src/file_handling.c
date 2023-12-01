@@ -305,4 +305,121 @@ void setCarDest()
    
 }
 
+// Comparator function for qsort.
+int compareVehicleRecords(const void *a, const void *b) {
+    VehicleRecord *recordA = (VehicleRecord *)a;
+    VehicleRecord *recordB = (VehicleRecord *)b;
+    return recordA->vin - recordB->vin; // Sorting by VIN
+}
+
+// Main function to sort vehicles.
+int sortVehicles() {
+    FILE *inFile = fopen("vehicles.txt", "r");
+    char buffer[MAX_LINE_LENGTH];
+
+    // Read and discard the header line.
+    if (!fgets(buffer, sizeof(buffer), inFile)) {
+        fclose(inFile);
+        return 2; // Error reading header line
+    }
+
+    int numEntries = 0;
+    while (fgets(buffer, sizeof(buffer), inFile)) {
+        numEntries++;
+    }
+    rewind(inFile);
+    // Discard the header line again after rewind.
+    fgets(buffer, sizeof(buffer), inFile); 
+
+    VehicleRecord *records = malloc(numEntries * sizeof(VehicleRecord)+1);
+    if (records == NULL) {
+        fclose(inFile);
+        return 3; // Error allocating memory
+    }
+
+    int recordCount = 0;
+
+    // Read and parse each line.
+    while (fgets(buffer, sizeof(buffer), inFile)) {
+        char *token = strtok(buffer, delimiter);
+        records[recordCount].vin = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        strncpy(records[recordCount].lastStable, token, sizeof(records[recordCount].lastStable));
+
+        token = strtok(NULL, delimiter);
+        strncpy(records[recordCount].lastStableQuad, token, sizeof(records[recordCount].lastStableQuad));
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].batteryCapacity = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].batteryCharge = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].batteryChargeRate = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].drivingDischargeRate = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].idleDischargeRate = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].moveTime = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].idleTime = atoi(token);
+
+        token = strtok(NULL, delimiter);
+        records[recordCount].chargeTime = atoi(token);
+
+        recordCount++;
+    }
+    numCars = recordCount;
+    car = (Car*)malloc(numCars * sizeof(Car)+1);
+    for(int i = 0; i < numCars; i++)
+    {
+        car[i].endIntersectionStatus = 0;
+    }
+    if(car == NULL)
+    {
+        printf("Error allocating memory for car array");
+        exit(EXIT_FAILURE);
+    }
+
+    // Sort the records by VIN.
+    qsort(records, recordCount, sizeof(VehicleRecord), compareVehicleRecords);
+
+    // Write the sorted records to the new file.
+    for (int i = 0; i < recordCount; i++) {
+        COORD tempCoord;
+        car[i].vehicleRecord.vin = records[i].vin;
+        car[i].vehicleRecord.batteryCapacity = records[i].batteryCapacity;
+        car[i].vehicleRecord.batteryCharge = records[i].batteryCharge;
+        car[i].vehicleRecord.batteryChargeRate = records[i].batteryChargeRate;
+        car[i].vehicleRecord.drivingDischargeRate = records[i].drivingDischargeRate;
+        car[i].vehicleRecord.idleDischargeRate = records[i].idleDischargeRate;
+        car[i].vehicleRecord.moveTime = records[i].moveTime;
+        car[i].vehicleRecord.idleTime = records[i].idleTime;
+        car[i].vehicleRecord.chargeTime = records[i].chargeTime;
+
+        tempCoord = getCoord(records[i].lastStable[0], records[i].lastStable[1], getEntranceEnum(records[i].lastStableQuad));
+        car[i].x = tempCoord.X;
+        car[i].y = tempCoord.Y;
+
+        car[i].endIntersectionStatus = 4;
+        
+    }
+    Car testCar = car[0];
+    free(records);
+    fclose(inFile);
+    return 0;
+}
+
+int initCars()
+{
+    
+}
+
 

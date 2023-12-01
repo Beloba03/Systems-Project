@@ -4,6 +4,20 @@
 #include <time.h>
 
 
+// Struct to define save data
+typedef struct {
+    int vin;
+    char lastStable[4];
+    char lastStableQuad[4];
+    int batteryCapacity;
+    int batteryCharge;
+    int batteryChargeRate;
+    int drivingDischargeRate;
+    int idleDischargeRate;
+    int moveTime;
+    int idleTime;
+    int chargeTime;
+} VehicleRecord;
 
 // Structure to define properties of a car in the city grid
 typedef struct {
@@ -15,4 +29,7 @@ typedef struct {
     COORD endPos;
     unsigned char endIntersectionStatus;
     CarDirection endDirection;
+    VehicleRecord vehicleRecord;
 } Car;
+
+extern void copyToMainBuffer();

@@ -79,30 +79,30 @@ location peek(int carNum, int locationPos) {
 }
 void printQueue(int carNum) {
     COORD oldPos = getCursorPosition();
-    setCursorPosition(0, 80);
+    //setCursorPosition(0, 80);
     // Start from the first node (skip the dummy head)
     LinkedList *current = car[carNum].locQueue.next;
 
     // Check if the queue is empty
     if (current == NULL) {
         car[carNum].endIntersectionStatus = 8;
-        printf("Car %d's queue is empty.\n", carNum);
+        //printf("Car %d's queue is empty.\n", carNum);
         return;
     }
 
-    printf("Queue for Car %d:\n", carNum);
+    //printf("Queue for Car %d:\n", carNum);
     while (current != NULL) {
         // Print each location's details
-        printf("Location - X: %d, Y: %d, Direction: %d, Floor: %d\n",
-               current->loc.endPos.X, current->loc.endPos.Y, 
-               current->loc.endDir, current->loc.floorNum);
+       //printf("Location - X: %d, Y: %d, Direction: %d, Floor: %d\n",
+               //current->loc.endPos.X, current->loc.endPos.Y, 
+               //current->loc.endDir, current->loc.floorNum);
 
         // Move to the next node
         current = current->next;
     }
-    for(int i = 0; i < 10; i++)
-        printf("                                                                                           \n");
-    setCursorPosition(oldPos.X, oldPos.Y);
+    //for(int i = 0; i < 10; i++)
+        //printf("                                                                                           \n");
+    //setCursorPosition(oldPos.X, oldPos.Y);
 }
 
 

@@ -89,7 +89,9 @@ extern int sortEvents();
 extern void checkForEvents();
 extern int convCustToRel();
 extern int setCarDest();
-
+extern void scrollToTop();
+extern void sortVehicles();
+extern void initCars();
 extern void staticCarNum();
 
 

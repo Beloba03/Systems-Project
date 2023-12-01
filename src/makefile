@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -g
 DEPS = BldgGen.h
-OBJ = car_functions.o initialised_vars.o main.o map_gen.o windows_init.o file_handling.o linked_list.o
+OBJ = windows_init.o car_functions.o initialised_vars.o main.o map_gen.o file_handling.o linked_list.o
 EXEC = CarProgram.exe
 BINDIR = ../bin
 

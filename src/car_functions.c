@@ -89,17 +89,7 @@ int getStartAndEndCoordinates() {
 #else
 void staticCarNum()
 {
-    car = (Car*)malloc(numCars * sizeof(Car)+1);
-    for(int i = 0; i < numCars; i++)
-    {
-        car[i].endIntersectionStatus = 0;
-    }
-    if(car == NULL)
-    {
-        printf("Error allocating memory for car array");
-        exit(EXIT_FAILURE);
-    }
-    return;
+    
 }
 #endif
 
@@ -371,7 +361,7 @@ void pathFind(int carNum, int reset)
             shortStopY[carNum] = 1;
             count[carNum] = 12;
         }
-        debugPrint(car[carNum].y, car[carNum].endIntersection.Y, getStDir(car[carNum].y), shortStopY[carNum]);
+        //debugPrint(car[carNum].y, car[carNum].endIntersection.Y, getStDir(car[carNum].y), shortStopY[carNum]);
     }
     else if(shortStopY[carNum] == 1) // Move past the end intersection by one block
     {
@@ -490,6 +480,10 @@ void animateCarNew(int carNum)
     else if(car[carNum].endIntersectionStatus == 3)
     {
         updateCar(getOppositeDirection(car[carNum].endDirection), carNum);
+        car[carNum].endIntersectionStatus = 4;
+    }
+    else if(car[carNum].endIntersectionStatus == 4)
+    {
         pathFind(carNum, 1);
         getNextPos(carNum);
         checkTime(carNum, 0, 1);

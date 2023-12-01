@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "directional_enums.h"
-#define MAX_LINE_LENGTH 256
+#define MAX_LINE_LENGTH 1024
 #define BUILDING_OFFSET 3
 
 
