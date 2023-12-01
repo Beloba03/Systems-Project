@@ -477,3 +477,6 @@ COORD findNearestChargingStation(int carX, int carY) {
 
     return nearestStation;
 }
+
+
+/// IMPLEMENT BETTER ALGORITHM : dijkstras OR SHORT PATH ALGORITHM
