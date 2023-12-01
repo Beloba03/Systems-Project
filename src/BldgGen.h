@@ -88,7 +88,7 @@ extern void freeGrid(unsigned int ySize);
 extern int sortEvents();
 extern void checkForEvents();
 extern int convCustToRel();
-extern int setCarDest(int carNum);
+extern int setCarDest();
 
 extern void staticCarNum();
 

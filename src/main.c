@@ -36,18 +36,16 @@ int main(int argc, char *argv[]) {
     staticCarNum();
     sortEvents();
     convCustToRel();
-    setCarDest(0);
-
+    setCarDest();
     // First request
-    printQueue(0);
-    location req1 = dequeue(0);
-    car[0].x = req1.endPos.X;
-    car[0].y = req1.endPos.Y;
-    location req2 = dequeue(0);
-    car[0].endPos.X = req2.endPos.X;
-    car[0].endPos.Y = req2.endPos.Y;
-    car[0].endDirection = req2.endDir;
-    calcIntersection(req2.endPos.X, req2.endPos.Y, 0);
+    for(int i = 0; i < numCars; i++)
+    {
+        car[i].x = 7;
+        car[i].y = 7;
+        car[i].endIntersectionStatus = 3;
+    }
+    
+
 
 
 

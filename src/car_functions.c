@@ -89,9 +89,11 @@ int getStartAndEndCoordinates() {
 #else
 void staticCarNum()
 {
-    int numCars = 1;
     car = (Car*)malloc(numCars * sizeof(Car)+1);
-    car[0].endIntersectionStatus = 0;
+    for(int i = 0; i < numCars; i++)
+    {
+        car[i].endIntersectionStatus = 0;
+    }
     if(car == NULL)
     {
         printf("Error allocating memory for car array");
@@ -143,6 +145,9 @@ void updateCar(CarDirection carDirection, int carNum) {
                     carDirection = MOVE_UP;
                     attempts--;
                 }
+                break;
+            case STOP:
+                attempts = 0; // Stop the loop
                 break;
         }
     }
@@ -490,6 +495,10 @@ void animateCarNew(int carNum)
         checkTime(carNum, 0, 1);
         car[carNum].endIntersectionStatus = 0;
 
+    }
+    else if(car[carNum].endIntersectionStatus == 8)
+    {
+        updateCar(STOP, carNum);
     }
 
     else if(car[carNum].endIntersectionStatus == 0)

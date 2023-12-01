@@ -27,8 +27,8 @@ typedef struct Customer{
 } Customer;
 
 // External Variables
-extern int time;
 extern Car *car;
+extern int numCars;
 extern void calcIntersection(int x, int y, int carNum);
 
 // External Functions

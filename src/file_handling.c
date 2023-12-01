@@ -262,8 +262,9 @@ int sortEvents() {
     return 0;
 }
 
-void setCarDest(int carNum)
+void setCarDest()
 {
+    int carNum = 0, doubleCount = 0;
     FILE *file = fopen("events_sorted.txt", "r");
     if (file == NULL) {
         printf("Error opening file!\n");
@@ -289,6 +290,16 @@ void setCarDest(int carNum)
         if (token) record.package_weight = atof(token);
         enqueue(carNum, getCustDest(record.origin_customer_id)); // Add pickup location
         enqueue(carNum, getCustDest(record.destination_customer_id)); // Add delivery location
+        doubleCount++;
+        if(doubleCount == 2)
+        {
+            doubleCount = 0;
+            carNum++;
+        }
+        if(carNum > numCars-1)
+        {
+            carNum = 0;
+        }
 
     }
    

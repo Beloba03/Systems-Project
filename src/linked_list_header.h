@@ -5,7 +5,8 @@ typedef enum CarDirection{
     MOVE_UP,
     MOVE_RIGHT,
     MOVE_DOWN,
-    MOVE_LEFT
+    MOVE_LEFT,
+    STOP
 } CarDirection;
 
 // Structure to define a location

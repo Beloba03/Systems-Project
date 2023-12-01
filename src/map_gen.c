@@ -11,7 +11,7 @@ This module contains functions relating to reading and creating the map
 char** cityGrid;
 COORD startOffset = {0, 0};
 unsigned int xbldg, ybldg, s1dir, a1dir;
-int numCars = 1;
+int numCars = 2;
 struct bldg_data bd;  // Declare a building data structure
 
 // This converts the quadrant to a string
