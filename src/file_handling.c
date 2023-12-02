@@ -377,11 +377,12 @@ int sortVehicles() {
         recordCount++;
     }
     numCars = recordCount;
-    car = (Car*)malloc(numCars * sizeof(Car)+1);
+    car = (Car*)malloc((numCars+1) * sizeof(Car)+1);
     for(int i = 0; i < numCars; i++)
     {
         car[i].endIntersectionStatus = 0;
     }
+    car[numCars].endIntersectionStatus = 7;
     if(car == NULL)
     {
         printf("Error allocating memory for car array");

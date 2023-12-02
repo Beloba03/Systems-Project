@@ -113,8 +113,20 @@ void printGrid(unsigned int xSize, unsigned int ySize) {
     setCursorPosition(startOffset.X, startOffset.Y);
     for (unsigned int y = 0; y < (ySize * SCALE_FACTOR) + LAST_STREET_OFFSET; y++) {
         for (unsigned int x = 0; x < (xSize * SCALE_FACTOR) + LAST_STREET_OFFSET; x++) {
+            #ifdef DEBUG
+            printf("%c", cityGrid[y][x]);
+            #else
+            if(cityGrid[y][x] == 'I' || cityGrid[y][x] == 'L' || cityGrid[y][x] == 'R' || cityGrid[y][x] == 'U' || cityGrid[y][x] == 'D' || cityGrid[y][x] == '-' || cityGrid[y][x] == '+')
+            {
+                printf(" ");
+            }
+            else
+            {
                 printf("%c", cityGrid[y][x]);
+            }
+            #endif
         }
+        
         printf("\n");
     }
 }
