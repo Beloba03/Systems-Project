@@ -237,7 +237,7 @@ CarDirection getOppositeDirection(CarDirection direction)
         case MOVE_RIGHT:
             return MOVE_LEFT;
     }
-    return MOVE_UP;
+    return NONE;
 }
 void pathFind(int carNum, int reset)
 {
@@ -466,12 +466,14 @@ void animateCarNew(int carNum)
             car[carNum].endIntersectionStatus = 2;
             checkTime(carNum, 0, 1);
             printQueue(carNum);
+            updateCar(STOP, carNum);
             return;
         }
     }
 
     else if(car[carNum].endIntersectionStatus == 2)
     {
+        updateCar(STOP, carNum);
         if(checkTime(carNum, 3, 0) == 1)
         {
             car[carNum].endIntersectionStatus = 3;
@@ -485,6 +487,7 @@ void animateCarNew(int carNum)
     else if(car[carNum].endIntersectionStatus == 4)
     {
         pathFind(carNum, 1);
+        updateCar(STOP, carNum);
         getNextPos(carNum);
         checkTime(carNum, 0, 1);
         car[carNum].endIntersectionStatus = 0;
@@ -502,5 +505,6 @@ void animateCarNew(int carNum)
     if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 0 && car[carNum].endIntersectionStatus == 0) // Checks if the car has reached the end intersection
         {
             car[carNum].endIntersectionStatus = 1;
+            updateCar(STOP, carNum);
         }
 }
