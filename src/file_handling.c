@@ -100,7 +100,7 @@ int convCustToRel() {
     int count;
     // Count number of lines that will be needed
     while(fgets(line, MAX_LINE_LENGTH, inFile)) {
-        token = strtok(line, " \t,"); // Delimiters are space, tab, and comma
+        token = strtok(line, delimiter); // Delimiters are space, tab, and comma
         if (token) count = atoi(token);
     }
     rewind(inFile); // Reset file pointer to the beginning
@@ -418,9 +418,32 @@ int sortVehicles() {
     return 0;
 }
 
-int initCars()
+EventRecord getTopEvent()
 {
-    
+    FILE *file = fopen("events_sorted.txt", "r");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    EventRecord record;
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);
+    char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
+    if (token) record.time = atoi(token);
+
+    token = strtok(NULL, delimiter);
+    if (token) record.event = token[0];
+
+    token = strtok(NULL, delimiter);
+    if (token) record.origin_customer_id = atoi(token);
+
+    token = strtok(NULL, delimiter);
+    if (token) record.destination_customer_id = atoi(token);
+
+    token = strtok(NULL, delimiter);
+    if (token) record.package_weight = atof(token);
+    fclose(file);
+    return record;
 }
 
 
