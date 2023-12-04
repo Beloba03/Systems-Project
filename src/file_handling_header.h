@@ -4,18 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "directional_enums.h"
+#include "car_header.h"
 #define MAX_LINE_LENGTH 1024
 #define BUILDING_OFFSET 3
 
-
-// Structure to define a delivery request
-typedef struct DeliveryRequest{
-    int time;
-    char event;
-    char origin_customer_id[50];
-    char destination_customer_id[50];
-    float package_weight;
-} DeliveryRequest;
 
 typedef struct Customer{
     int customer_id;

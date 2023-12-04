@@ -32,12 +32,11 @@ int main(int argc, char *argv[]) {
      // Read the data from the file and set up the city grid layout.
     read_file();
     sortVehicles();
-    initCars();
     // Prepare the console for the animation.
     staticCarNum();
     sortEvents();
     convCustToRel();
-    setCarDest();
+    
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
             int endIX = car[i].endIntersection.X, endIY = car[i].endIntersection.Y, endX = car[i].endPos.X, endY = car[i].endPos.Y, curx = car[i].x, cury = car[i].y;
             animateCarNew(i);
         }
-        
         tickTime++;
         Sleep(20);
     }

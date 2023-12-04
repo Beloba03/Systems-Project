@@ -167,7 +167,7 @@ CarDirection getEndDirection(enum QUAD endQuad)
         case(SW): return MOVE_UP;
     }
 }
-location getCustDest(int custID) {
+location getCustDest(int custID, int time) {
     FILE *file = fopen("Customers.dat", "rb");
     location retVal;
     if (file == NULL) {
@@ -181,16 +181,9 @@ location getCustDest(int custID) {
     retVal.endPos = getCoord(customer.building[0], customer.building[1], customer.entrance);
     retVal.endDir = getEndDirection(customer.entrance);
     retVal.floorNum = customer.floor;
+    retVal.time = time;
     return retVal;
 }
-
-typedef struct {
-    int time;
-    char event;
-    int origin_customer_id;
-    int destination_customer_id;
-    float package_weight;
-} EventRecord;
 
 int compareEventRecords(const void *a, const void *b) {
     EventRecord *recordA = (EventRecord *)a;
@@ -219,6 +212,7 @@ int sortEvents() {
         numEntries++;
     }
     rewind(inFile);
+    fgets(buffer, sizeof(buffer), inFile); // Skip header line
 
 
     EventRecord records[numEntries];
@@ -260,49 +254,6 @@ int sortEvents() {
     fclose(inFile);
     fclose(outFile);
     return 0;
-}
-
-void setCarDest()
-{
-    int carNum = 0, doubleCount = 0;
-    FILE *file = fopen("events_sorted.txt", "r");
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return;
-    }
-    EventRecord record;
-    char line[MAX_LINE_LENGTH];
-    fgets(line, MAX_LINE_LENGTH, file); // Skip header line
-    while(fgets(line, MAX_LINE_LENGTH, file)) {
-        char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
-        if (token) record.time = atoi(token);
-
-        token = strtok(NULL, delimiter);
-        if (token) record.event = token[0];
-
-        token = strtok(NULL, delimiter);
-        if (token) record.origin_customer_id = atoi(token);
-
-        token = strtok(NULL, delimiter);
-        if (token) record.destination_customer_id = atoi(token);
-
-        token = strtok(NULL, delimiter);
-        if (token) record.package_weight = atof(token);
-        enqueue(carNum, getCustDest(record.origin_customer_id)); // Add pickup location
-        enqueue(carNum, getCustDest(record.destination_customer_id)); // Add delivery location
-        doubleCount++;
-        if(doubleCount == 2)
-        {
-            doubleCount = 0;
-            carNum++;
-        }
-        if(carNum > numCars-1)
-        {
-            carNum = 0;
-        }
-
-    }
-   
 }
 
 // Comparator function for qsort.
@@ -380,9 +331,10 @@ int sortVehicles() {
     car = (Car*)malloc((numCars+1) * sizeof(Car)+1);
     for(int i = 0; i < numCars; i++)
     {
-        car[i].endIntersectionStatus = 0;
+        car[i].locQueue.next = NULL;
+        getNextEvent(i);
+        car[i].endIntersectionStatus = 4;
     }
-    car[numCars].endIntersectionStatus = 7;
     if(car == NULL)
     {
         printf("Error allocating memory for car array");
@@ -408,26 +360,32 @@ int sortVehicles() {
         tempCoord = getCoord(records[i].lastStable[0], records[i].lastStable[1], getEntranceEnum(records[i].lastStableQuad));
         car[i].x = tempCoord.X;
         car[i].y = tempCoord.Y;
-
-        car[i].endIntersectionStatus = 4;
         
     }
-    Car testCar = car[0];
     free(records);
     fclose(inFile);
     return 0;
 }
 
-EventRecord getTopEvent()
+EventRecord getCurrentEvent()
 {
-    FILE *file = fopen("events_sorted.txt", "r");
+    static FILE *file = NULL;
     if (file == NULL) {
-        printf("Error opening file!\n");
-        return;
+        file = fopen("events_sorted.txt", "r");
+        if (file == NULL) {
+            printf("Error opening file!\n");
+            return;
+        }
     }
+
     EventRecord record;
     char line[MAX_LINE_LENGTH];
-    fgets(line, MAX_LINE_LENGTH, file);
+
+    if (fgets(line, MAX_LINE_LENGTH, file) == NULL) {
+        record.time = -1;
+        return record; // Or handle EOF differently if needed
+    }
+
     char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
     if (token) record.time = atoi(token);
 
@@ -442,8 +400,7 @@ EventRecord getTopEvent()
 
     token = strtok(NULL, delimiter);
     if (token) record.package_weight = atof(token);
-    fclose(file);
+
+    // Do not close the file here
     return record;
 }
-
-

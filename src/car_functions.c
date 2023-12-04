@@ -239,6 +239,24 @@ CarDirection getOppositeDirection(CarDirection direction)
     }
     return NONE;
 }
+void getNextEvent(int carNum)
+{
+    if(car[carNum].locQueue.next == NULL)
+    {
+        EventRecord currentEvent = getCurrentEvent();
+        if(currentEvent.time == -1)
+        {
+            car[carNum].endIntersectionStatus = 8;
+            return;
+        }
+        car[carNum].endIntersectionStatus = 2;
+        enqueue(carNum, getCustDest(currentEvent.origin_customer_id, currentEvent.time));
+        enqueue(carNum, getCustDest(currentEvent.destination_customer_id, currentEvent.time));
+
+
+    }
+    
+}
 void pathFind(int carNum, int reset)
 {
     static int count[MAX_CAR_NUM] = {0}, startInd[MAX_CAR_NUM] = {0}, shortStopX[MAX_CAR_NUM] = {0}, shortStopY[MAX_CAR_NUM] = {0}, passY[MAX_CAR_NUM] = {0}, startIndAve[MAX_CAR_NUM] = {0}, runOnce[MAX_CAR_NUM] = {0}; // Static variables to keep track of the car's movement
@@ -443,6 +461,7 @@ void getNextPos(int carNum)
 // This function animates the car's movement between current location and end intersection
 void animateCarNew(int carNum)
 {
+    int test = car[carNum].endIntersectionStatus;
     if(car[carNum].endIntersectionStatus == 1)
     {
         int xCount = car[carNum].x - car[carNum].endPos.X, yCount = car[carNum].y - car[carNum].endPos.Y, dirX = greaterOrLess(car[carNum].x, car[carNum].endPos.X), dirY = greaterOrLess(car[carNum].y, car[carNum].endPos.Y);
@@ -465,12 +484,14 @@ void animateCarNew(int carNum)
             updateCar(car[carNum].endDirection, carNum);
             car[carNum].endIntersectionStatus = 2;
             checkTime(carNum, 0, 1);
-            printQueue(carNum);
-            updateCar(STOP, carNum);
+            getNextEvent(carNum);
             return;
         }
     }
-
+    else if(car[carNum].endIntersectionStatus == 0)
+    {
+        pathFind(carNum, 0);
+    }
     else if(car[carNum].endIntersectionStatus == 2)
     {
         updateCar(STOP, carNum);
@@ -481,14 +502,25 @@ void animateCarNew(int carNum)
     }
     else if(car[carNum].endIntersectionStatus == 3)
     {
-        updateCar(getOppositeDirection(car[carNum].endDirection), carNum);
-        car[carNum].endIntersectionStatus = 4;
+        // updateCar(STOP, carNum);
+        // if(car[carNum].delTime <= tickTime)
+        // {
+            //int carTime = car[carNum].delTime;
+            //int tickTimeTemp = tickTime;
+            updateCar(getOppositeDirection(car[carNum].endDirection), carNum);
+            car[carNum].endIntersectionStatus = 4;
+        // }
+        // else
+        // {
+        //     printf("waiting");
+        // }
+        
     }
     else if(car[carNum].endIntersectionStatus == 4)
     {
+        getNextPos(carNum);
         pathFind(carNum, 1);
         updateCar(STOP, carNum);
-        getNextPos(carNum);
         checkTime(carNum, 0, 1);
         car[carNum].endIntersectionStatus = 0;
 
@@ -496,11 +528,6 @@ void animateCarNew(int carNum)
     else if(car[carNum].endIntersectionStatus == 8)
     {
         updateCar(STOP, carNum);
-    }
-
-    else if(car[carNum].endIntersectionStatus == 0)
-    {
-        pathFind(carNum, 0);
     }
     if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 0 && car[carNum].endIntersectionStatus == 0) // Checks if the car has reached the end intersection
         {

@@ -15,7 +15,7 @@ Building file structure:
 	0 0 - int int - end of file
 */
 #pragma once
-#pragma comment(linker, "/HEAP:2000000") // Set heap size to 2MB
+
 #define _CRT_SECURE_NO_WARNINGS
 
 // Header files
@@ -92,7 +92,6 @@ extern int convCustToRel();
 extern int setCarDest();
 extern void scrollToTop();
 extern void sortVehicles();
-extern void initCars();
 extern void staticCarNum();
 
 

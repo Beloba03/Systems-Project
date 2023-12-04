@@ -5,6 +5,6 @@ Customer-ID First-Name  Last-Name   Building    Entrance    Floor
 4           Mary        Smith       AA           E           1
 5           John        Smith       EF           E           1
 6           Alfred        Johnson         DA           N           100
-7           Jane        Doe         FF           S           3
+7           Jane        Doe         DD           S           3
 8           Fred        Down        HE           N          4
 9           Mary        Smith       FA           E           1

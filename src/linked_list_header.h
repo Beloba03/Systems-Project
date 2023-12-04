@@ -14,6 +14,7 @@ typedef struct location {
     COORD endPos;
     CarDirection endDir;
     int floorNum;
+    int time;
 } location;
 
 // Structure to define a linked list

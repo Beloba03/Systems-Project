@@ -23,8 +23,8 @@ typedef struct {
 typedef struct {
     unsigned int x;     // x-position
     unsigned int y;     // y-position
-    LinkedList *currentLoc; // Current location
     LinkedList locQueue;    // Queue of locations
+    int delTime; // Current Delivery Time
     COORD endIntersection;
     COORD endPos;
     unsigned char endIntersectionStatus;
@@ -32,4 +32,16 @@ typedef struct {
     VehicleRecord vehicleRecord;
 } Car;
 
+typedef struct {
+    int time;
+    char event;
+    int origin_customer_id;
+    int destination_customer_id;
+    float package_weight;
+} EventRecord;
+
+
 extern void copyToMainBuffer();
+extern EventRecord getCurrentEvent();
+extern location getCustDest(int custID, int time);
+extern int tickTime;
