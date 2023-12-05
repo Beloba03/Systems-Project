@@ -51,13 +51,14 @@ int main(int argc, char *argv[]) {
         Sleep(20);
     }
     // Set the cursor position to the bottom of the grid.
-    setCursorPosition(0, SCALE_FACTOR*ybldg+7);
+    setCursorPosition(0, SCALE_FACTOR*ybldg+3);
     printf("\nDone\n");  // Inform the user that the animation is complete.
 
     (void) getchar();    // Wait for a character input before exiting.
 
     // Clean up resources.
     freeGrid(ybldg);
+    getCurrentEvent(1);
 
     return 0; // Return a success code.
 }

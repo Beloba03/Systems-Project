@@ -95,4 +95,5 @@ extern void scrollToTop();
 extern void sortVehicles();
 extern void staticCarNum();
 extern void printTime(int time);
+extern EventRecord getCurrentEvent(int reset);
 

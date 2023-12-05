@@ -263,7 +263,7 @@ int compareVehicleRecords(const void *a, const void *b) {
 }
 
 // Main function to sort vehicles.
-int sortVehicles() {
+int sortVehicles(int end) {
     FILE *inFile = fopen("vehicles.txt", "r");
     char buffer[MAX_LINE_LENGTH];
 
@@ -327,7 +327,7 @@ int sortVehicles() {
         recordCount++;
     }
     numCars = recordCount;
-    car = (Car*)malloc((numCars+1) * sizeof(Car)+1);
+    car = (Car*)malloc((numCars) * sizeof(Car)+1);
     for(int i = 0; i < numCars; i++)
     {
         car[i].locQueue.next = NULL;
@@ -366,7 +366,7 @@ int sortVehicles() {
     return 0;
 }
 
-EventRecord getCurrentEvent()
+EventRecord getCurrentEvent(int reset)
 {
     static FILE *file = NULL;
     if (file == NULL) {
@@ -376,7 +376,10 @@ EventRecord getCurrentEvent()
             return;
         }
     }
-
+    if(reset)
+    {
+        fclose(file);
+    }
     EventRecord record;
     char line[MAX_LINE_LENGTH];
 

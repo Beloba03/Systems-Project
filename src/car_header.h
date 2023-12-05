@@ -9,22 +9,23 @@ typedef struct {
     int vin;
     char lastStable[4];
     char lastStableQuad[4];
-    int batteryCapacity;
-    int batteryCharge;
-    int batteryChargeRate;
-    int drivingDischargeRate;
-    int idleDischargeRate;
-    int moveTime;
-    int idleTime;
-    int chargeTime;
+    unsigned int batteryCapacity;
+    unsigned int batteryCharge;
+    unsigned int batteryChargeRate;
+    unsigned int drivingDischargeRate;
+    unsigned int idleDischargeRate;
+    unsigned int moveTime;
+    unsigned int idleTime;
+    unsigned int chargeTime;
 } VehicleRecord;
 
 // Structure to define properties of a car in the city grid
 typedef struct {
     unsigned int x;     // x-position
     unsigned int y;     // y-position
+    unsigned int endFloor;
     LinkedList locQueue;    // Queue of locations
-    int delTime; // Current Delivery Time
+    unsigned int delTime; // Current Delivery Time
     COORD endIntersection;
     COORD endPos;
     unsigned char endIntersectionStatus;
@@ -42,6 +43,6 @@ typedef struct {
 
 
 extern void copyToMainBuffer();
-extern EventRecord getCurrentEvent();
+extern EventRecord getCurrentEvent(int reset);
 extern location getCustDest(int custID);
 extern int tickTime;

@@ -245,7 +245,7 @@ void getNextEvent(int carNum)
 {
     if(car[carNum].locQueue.next == NULL)
     {
-        EventRecord currentEvent = getCurrentEvent();
+        EventRecord currentEvent = getCurrentEvent(0);
         if(currentEvent.time == -1)
         {
             car[carNum].endIntersectionStatus = 8;
@@ -430,7 +430,7 @@ void pathFind(int carNum, int reset)
     }
 }
 
-int checkTime(int carNum, int passTime, int reset)
+int checkTime(int carNum, int passTime, int floor, int reset)
 {
     static time_t curTime[MAX_CAR_NUM] = {0}; // Static array to store times for each car
 
@@ -442,7 +442,7 @@ int checkTime(int carNum, int passTime, int reset)
     else
     {
         // Check if the current time is greater or equal to the stored time plus passTime
-        if(time(NULL) >= curTime[carNum] + passTime)
+        if(time(NULL) >= curTime[carNum] + passTime*floor)
         {
             return 1; // Return 1 if the time has passed
         }
@@ -459,6 +459,7 @@ void getNextPos(int carNum)
     car[carNum].endPos.X = newPos.endPos.X;
     car[carNum].endPos.Y = newPos.endPos.Y;
     car[carNum].endDirection = newPos.endDir;
+    car[carNum].endFloor = newPos.floorNum;
     calcIntersection(newPos.endPos.X, newPos.endPos.Y, carNum);
 }
 // This function animates the car's movement between current location and end intersection
@@ -486,7 +487,7 @@ void animateCarNew(int carNum)
         {
             updateCar(car[carNum].endDirection, carNum);
             car[carNum].endIntersectionStatus = 2;
-            checkTime(carNum, 0, 1);
+            checkTime(carNum, 0, 0, 1);
             getNextEvent(carNum);
             return;
         }
@@ -498,7 +499,7 @@ void animateCarNew(int carNum)
     else if(car[carNum].endIntersectionStatus == 2)
     {
         updateCar(STOP, carNum);
-        if(checkTime(carNum, 3, 0) == 1)
+        if(checkTime(carNum, 3, car[carNum].endFloor,0) == 1)
         {
             car[carNum].endIntersectionStatus = 3;
         }
@@ -520,13 +521,17 @@ void animateCarNew(int carNum)
         getNextPos(carNum);
         pathFind(carNum, 1);
         updateCar(STOP, carNum);
-        checkTime(carNum, 0, 1);
+        checkTime(carNum, 0, 0, 1);
         car[carNum].endIntersectionStatus = 0;
 
     }
     else if(car[carNum].endIntersectionStatus == 8)
     {
         updateCar(STOP, carNum);
+    }
+    else
+    {
+        //car[carNum].endIntersectionStatus = 4;
     }
     if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 0 && car[carNum].endIntersectionStatus == 0) // Checks if the car has reached the end intersection
         {
