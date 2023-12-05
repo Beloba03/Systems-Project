@@ -40,8 +40,9 @@ int main(int argc, char *argv[]) {
     // Variables to track the car's movement on the console.
     int destStatus = 0, wasDKeyPressed = 0;
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
-
+        printTime(tickTime);    // Print the current time.
         // Animate each car on the grid.
+        int testNumCars = numCars;
         for (int i = 0; i < numCars; i++) {
             int endIX = car[i].endIntersection.X, endIY = car[i].endIntersection.Y, endX = car[i].endPos.X, endY = car[i].endPos.Y, curx = car[i].x, cury = car[i].y;
             animateCarNew(i);

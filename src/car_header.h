@@ -43,5 +43,5 @@ typedef struct {
 
 extern void copyToMainBuffer();
 extern EventRecord getCurrentEvent();
-extern location getCustDest(int custID, int time);
+extern location getCustDest(int custID);
 extern int tickTime;

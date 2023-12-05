@@ -167,7 +167,7 @@ CarDirection getEndDirection(enum QUAD endQuad)
         case(SW): return MOVE_UP;
     }
 }
-location getCustDest(int custID, int time) {
+location getCustDest(int custID) {
     FILE *file = fopen("Customers.dat", "rb");
     location retVal;
     if (file == NULL) {
@@ -181,7 +181,6 @@ location getCustDest(int custID, int time) {
     retVal.endPos = getCoord(customer.building[0], customer.building[1], customer.entrance);
     retVal.endDir = getEndDirection(customer.entrance);
     retVal.floorNum = customer.floor;
-    retVal.time = time;
     return retVal;
 }
 

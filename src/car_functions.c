@@ -216,6 +216,8 @@ void calcIntersection(int x, int y, int carNum)
             int stDir = getStDir(y);
             if(stDir == 0)
                 stDir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
+            if(stDir == 0)
+                stDir = -1;
             x = x-stDir;
         }
 
@@ -250,8 +252,9 @@ void getNextEvent(int carNum)
             return;
         }
         car[carNum].endIntersectionStatus = 2;
-        enqueue(carNum, getCustDest(currentEvent.origin_customer_id, currentEvent.time));
-        enqueue(carNum, getCustDest(currentEvent.destination_customer_id, currentEvent.time));
+        enqueue(carNum, getCustDest(currentEvent.origin_customer_id));
+        enqueue(carNum, getCustDest(currentEvent.destination_customer_id));
+        car[carNum].delTime = currentEvent.time;
 
 
     }
@@ -502,18 +505,14 @@ void animateCarNew(int carNum)
     }
     else if(car[carNum].endIntersectionStatus == 3)
     {
-        // updateCar(STOP, carNum);
-        // if(car[carNum].delTime <= tickTime)
-        // {
-            //int carTime = car[carNum].delTime;
-            //int tickTimeTemp = tickTime;
+        updateCar(STOP, carNum);
+        if(car[carNum].delTime <= tickTime)
+        {
+            int carTime = car[carNum].delTime;
+            int tickTimeTemp = tickTime;
             updateCar(getOppositeDirection(car[carNum].endDirection), carNum);
             car[carNum].endIntersectionStatus = 4;
-        // }
-        // else
-        // {
-        //     printf("waiting");
-        // }
+        }
         
     }
     else if(car[carNum].endIntersectionStatus == 4)
@@ -534,4 +533,12 @@ void animateCarNew(int carNum)
             car[carNum].endIntersectionStatus = 1;
             updateCar(STOP, carNum);
         }
+}
+
+void printTime(int time)
+{
+    COORD curPos = getCursorPosition();
+    setCursorPosition(0, 0);
+    printf("Time: %i", time);
+    setCursorPosition(curPos.X, curPos.Y);
 }

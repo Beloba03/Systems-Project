@@ -72,6 +72,7 @@ extern unsigned int xbldg;
 extern int numCars;
 extern Car *car;
 
+
 // File pointer for the building data file
 FILE* bfd;
 
@@ -93,5 +94,5 @@ extern int setCarDest();
 extern void scrollToTop();
 extern void sortVehicles();
 extern void staticCarNum();
-
+extern void printTime(int time);
 
