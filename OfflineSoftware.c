@@ -66,41 +66,52 @@ void queryBillNumber(const char *filename, int billNum) {
     fclose(file);
 }
 
-
-
-
 void readSpecificSenderRecords(const char *filename, int senderID) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
-        printf("Error opening file");
-        getchar();
+        perror("Error opening file");
         return;
     }
 
-    // Go to the last record
-    fseek(file, -sizeof(DeliveryRecord), SEEK_END);
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    int found = 0;  // Flag to indicate if any records are found for the sender
 
-    DeliveryRecord record;
     printf("Records for Sender ID %d:\n", senderID);
     printf("Package Num | Destination ID\n");
     printf("----------------------------------------------------\n");
 
-    while (fread(&record, sizeof(DeliveryRecord), 1, file) == 1) {
-        if (record.originCustomerID == senderID) {
-            printf("%5d       | %5d\n",
-                   record.packageNum, record.destinationCustomerID);
-            if (record.prevSameSenderPos == -1) {
-                break; // Reached the first record of this sender
+    // Iterate backwards through the file
+    for (long position = fileSize - sizeof(DeliveryRecord); position >= sizeof(DeliveryRecord); position -= sizeof(DeliveryRecord)) {
+        fseek(file, position, SEEK_SET);
+        DeliveryRecord record;
+        if (fread(&record, sizeof(DeliveryRecord), 1, file) == 1) {
+            if (record.originCustomerID == senderID) {
+                found = 1;
+                printf("%11d | %14d\n", record.packageNum, record.destinationCustomerID);
+
+                // If there is no previous record for this sender, stop the search
+                if (record.prevSameSenderPos == -1) {
+                    break;
+                }
+
+                // Set the position to the previous record of the same sender
+                position = record.prevSameSenderPos + sizeof(DeliveryRecord);
+                continue;
             }
-            fseek(file, record.prevSameSenderPos, SEEK_SET); // Go to the previous record of this sender
         } else {
-            // Move to the previous record
-            fseek(file, -2 * sizeof(DeliveryRecord), SEEK_CUR);
+            // If read fails, break out of the loop
+            break;
         }
+    }
+
+    if (!found) {
+        printf("No records found for Sender ID %d.\n", senderID);
     }
 
     fclose(file);
 }
+
 
 // The main function
 int main() {
