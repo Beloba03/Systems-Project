@@ -9,8 +9,6 @@ This module contains functions relating to the car's initialization ,movement, a
 #include "car_header.h"
 #include "linked_list_header.h"
 #define DEBUG // Comment this out to remove debug information
-//#define MANUAL_ENTRY // Comment this out to remove manual entry of car's start and end coordinates
-
 // Declare a car variable array
 Car *car;
 EventRecord *currentEvents;
@@ -24,7 +22,6 @@ int isSpaceFree(int x, int y) {
 }
 
 // Function to map integer to QUAD enum
-
 enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
     if(strcmp(quadString, "N") == 0)
         return N;
