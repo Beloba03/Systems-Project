@@ -34,7 +34,7 @@ typedef struct {
     int destination_customer_id;
     float package_weight;
 } EventRecord;
-COORD getCoord(char x, char y, enum QUAD direction) {
+COORD getCoord(char x, char y, enum QUAD direction, char test) {
     COORD newCoord;
     
     // Map input coordinates AA, AB, AC, etc., to actual values
@@ -90,7 +90,7 @@ COORD getCustDest(int custID) {
     fseek(file, sizeof(Customer) * (custID - 1), SEEK_SET);
     fread(&customer, sizeof(Customer), 1, file);
     fclose(file);
-    return getCoord(customer.building[0], customer.building[1], customer.entrance);
+    return getCoord(customer.building[0], customer.building[1], customer.entrance, 's');
 }
 
 void setCarDest(int carNum)

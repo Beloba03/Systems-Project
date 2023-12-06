@@ -12,8 +12,17 @@ char *delimiter = ",\t\n ";
 
 
 
-COORD getCoord(char x, char y, enum QUAD direction) {
+COORD getCoord(char x, char y, enum QUAD direction, char stOrPkSpt) {
     COORD newCoord;
+    int BUILDING_OFFSET;
+    if(stOrPkSpt == 's') // Gets street position
+    {
+        BUILDING_OFFSET = 3; // Offset from the building center to the entrance
+    }
+    else // Gets parking spot position
+    {
+        BUILDING_OFFSET = 2; // Offset from the building center to the entrance
+    }
     
     // Map input coordinates AA, AB, AC, etc., to actual values
     newCoord.X = (x - 'A') * 6 + 4; // 'A' maps to 4, 'B' to 10, 'C' to 16, and so on...
@@ -178,7 +187,7 @@ location getCustDest(int custID) {
     fseek(file, sizeof(Customer) * (custID - 1), SEEK_SET);
     fread(&customer, sizeof(Customer), 1, file);
     fclose(file);
-    retVal.endPos = getCoord(customer.building[0], customer.building[1], customer.entrance);
+    retVal.endPos = getCoord(customer.building[0], customer.building[1], customer.entrance, 's');
     retVal.endDir = getEndDirection(customer.entrance);
     retVal.floorNum = customer.floor;
     return retVal;
@@ -328,11 +337,12 @@ int sortVehicles(int end) {
     }
     numCars = recordCount;
     car = (Car*)malloc((numCars) * sizeof(Car)+1);
+    currentEvents = (EventRecord*)malloc((numCars) * sizeof(EventRecord)+1);
     for(int i = 0; i < numCars; i++)
     {
         car[i].locQueue.next = NULL;
         getNextEvent(i);
-        car[i].endIntersectionStatus = 4;
+        car[i].endIntersectionStatus = 3;
     }
     if(car == NULL)
     {
@@ -356,7 +366,9 @@ int sortVehicles(int end) {
         car[i].vehicleRecord.idleTime = records[i].idleTime;
         car[i].vehicleRecord.chargeTime = records[i].chargeTime;
 
-        tempCoord = getCoord(records[i].lastStable[0], records[i].lastStable[1], getEntranceEnum(records[i].lastStableQuad));
+        enum QUAD entPos = getEntranceEnum(records[i].lastStableQuad);;
+        tempCoord = getCoord(records[i].lastStable[0], records[i].lastStable[1], entPos, 'p');
+        car[i].endDirection = getEndDirection(entPos);
         car[i].x = tempCoord.X;
         car[i].y = tempCoord.Y;
         
@@ -385,7 +397,7 @@ EventRecord getCurrentEvent(int reset)
 
     if (fgets(line, MAX_LINE_LENGTH, file) == NULL) {
         record.time = -1;
-        return record; // Or handle EOF differently if needed
+        return record;
     }
 
     char *token = strtok(line, delimiter); // Delimiters are space, tab, and comma
@@ -405,4 +417,60 @@ EventRecord getCurrentEvent(int reset)
 
     // Do not close the file here
     return record;
+}
+
+int getLastPackageNumber(FILE *file) {
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    if (fileSize <= HEADER_SIZE) {
+        return 500; // Default start number if only header is present
+    }
+
+    fseek(file, fileSize - sizeof(DeliveryRecord), SEEK_SET);
+    DeliveryRecord lastRecord;
+    fread(&lastRecord, sizeof(DeliveryRecord), 1, file);
+    return lastRecord.packageNum + 1;
+}
+
+void saveDelInfo(int carNum) {
+    FILE *file = fopen("delivery_record.dat", "rb+");
+    if (!file) {
+        // File doesn't exist, create it and write a header of zeros
+        file = fopen("delivery_record.dat", "wb");
+        if (!file) {
+            perror("Error opening file");
+            return;
+        }
+        DeliveryRecord header = {0};
+        fwrite(&header, sizeof(DeliveryRecord), 1, file);
+        fclose(file);
+        file = fopen("delivery_record.dat", "rb+");
+    }
+
+    int curPackageNum = getLastPackageNumber(file);
+
+    // Find the position of the last record with the same originCustomerID
+    long prevSameSenderPos = -1;
+    DeliveryRecord tempRecord;
+    fseek(file, HEADER_SIZE, SEEK_SET); // Start after the header
+    while (fread(&tempRecord, sizeof(DeliveryRecord), 1, file) == 1) {
+        if (tempRecord.originCustomerID == currentEvents[carNum].origin_customer_id) {
+            prevSameSenderPos = ftell(file) - sizeof(DeliveryRecord);
+        }
+    }
+
+    DeliveryRecord newRecord = {
+        .packageNum = curPackageNum,
+        .time = currentEvents[carNum].time,
+        .event = currentEvents[carNum].event,
+        .originCustomerID = currentEvents[carNum].origin_customer_id,
+        .destinationCustomerID = currentEvents[carNum].destination_customer_id,
+        .packageWeight = currentEvents[carNum].package_weight,
+        .deliveryTime = tickTime,
+        .prevSameSenderPos = prevSameSenderPos
+    };
+
+    fseek(file, 0, SEEK_END);
+    fwrite(&newRecord, sizeof(DeliveryRecord), 1, file);
+    fclose(file);
 }

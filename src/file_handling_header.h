@@ -6,7 +6,8 @@
 #include "directional_enums.h"
 #include "car_header.h"
 #define MAX_LINE_LENGTH 1024
-#define BUILDING_OFFSET 3
+#define START_PACKAGE_NUM 500
+#define HEADER_SIZE sizeof(DeliveryRecord)
 
 
 typedef struct Customer{
@@ -18,8 +19,20 @@ typedef struct Customer{
     enum QUAD entrance;
 } Customer;
 
+typedef struct {
+    int packageNum;
+    int time;
+    char event;
+    int originCustomerID;
+    int destinationCustomerID;
+    float packageWeight;
+    int deliveryTime;
+    long prevSameSenderPos; // Field to store the position of the previous record with the same sender
+} DeliveryRecord;
+
 // External Variables
 extern Car *car;
+extern EventRecord *currentEvents;
 extern int numCars;
 extern int tickTime;
 extern void calcIntersection(int x, int y, int carNum);

@@ -1,5 +1,5 @@
 VIN-(starting at 100)   Last-Stable    Last-Stable-Quad      Battery-Capacity    Battery-Charge  Battery-Charge-Rate   Driving-Discharge-Rate    Idle-Rate   Move-Time  Idle-Time   Charge-Time
 100 AA S 100 78 1 1 1 1 1 1
-101 CC N 100 78 1 1 1 1 1 1
-102 DD N 100 78 1 1 1 1 1 1
-103 AD N 100 78 1 1 1 1 1 1
+101 CD N 100 78 1 1 1 1 1 1
+102 BA N 100 78 1 1 1 1 1 1
+103 DD N 100 78 1 1 1 1 1 1

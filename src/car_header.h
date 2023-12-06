@@ -46,3 +46,4 @@ extern void copyToMainBuffer();
 extern EventRecord getCurrentEvent(int reset);
 extern location getCustDest(int custID);
 extern int tickTime;
+extern void saveDelInfo(int carNum);

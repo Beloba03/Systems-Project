@@ -13,6 +13,7 @@ This module contains functions relating to the car's initialization ,movement, a
 
 // Declare a car variable array
 Car *car;
+EventRecord *currentEvents;
 
 // Check if the space is free (is a street)
 int isSpaceFree(int x, int y) {
@@ -245,16 +246,21 @@ void getNextEvent(int carNum)
 {
     if(car[carNum].locQueue.next == NULL)
     {
-        EventRecord currentEvent = getCurrentEvent(0);
-        if(currentEvent.time == -1)
+        static int runOnce[MAX_CAR_NUM] = {0};
+        if(!runOnce[carNum])
+            runOnce[carNum] = 1;
+        else
+            saveDelInfo(carNum);
+        currentEvents[carNum] = getCurrentEvent(0);
+        if(currentEvents[carNum].time == -1)
         {
             car[carNum].endIntersectionStatus = 8;
             return;
         }
         car[carNum].endIntersectionStatus = 2;
-        enqueue(carNum, getCustDest(currentEvent.origin_customer_id));
-        enqueue(carNum, getCustDest(currentEvent.destination_customer_id));
-        car[carNum].delTime = currentEvent.time;
+        enqueue(carNum, getCustDest(currentEvents[carNum].origin_customer_id));
+        enqueue(carNum, getCustDest(currentEvents[carNum].destination_customer_id));
+        car[carNum].delTime = currentEvents[carNum].time;
 
 
     }
