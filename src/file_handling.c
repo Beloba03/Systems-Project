@@ -432,10 +432,76 @@ int getLastPackageNumber(FILE *file) {
     return lastRecord.packageNum + 1;
 }
 
+typedef struct {
+    int customerID;
+    long recordPosition;
+} CustomerIndex;
+
+void updateCustomerIndex(const char* indexFilename, int customerID, long position) {
+    FILE *indexFile = fopen(indexFilename, "rb+");
+    if (!indexFile) {
+        indexFile = fopen(indexFilename, "wb");
+        if (!indexFile) {
+            perror("Error opening index file");
+            return;
+        }
+
+        // Write a header record (filled with zeros) when creating the file for the first time
+        CustomerIndex header = {0};
+        fwrite(&header, sizeof(CustomerIndex), 1, indexFile);
+        fclose(indexFile);
+        indexFile = fopen(indexFilename, "rb+");
+    }
+
+    CustomerIndex entry;
+    int found = 0;
+
+    // Search for existing entry
+    while (fread(&entry, sizeof(CustomerIndex), 1, indexFile) == 1) {
+        if (entry.customerID == customerID) {
+            found = 1;
+            break;
+        }
+    }
+
+    if (found) {
+        // Update existing entry
+        fseek(indexFile, -sizeof(CustomerIndex), SEEK_CUR);
+    } else {
+        // Add new entry at the end
+        fseek(indexFile, 0, SEEK_END);
+    }
+
+    entry.customerID = customerID;
+    entry.recordPosition = position;
+    fwrite(&entry, sizeof(CustomerIndex), 1, indexFile);
+
+    fclose(indexFile);
+}
+
+
+long getPreviousSenderPosition(const char* indexFilename, int customerID) {
+    FILE *indexFile = fopen(indexFilename, "rb");
+    if (!indexFile) {
+        return -1; // Index file doesn't exist or can't be opened
+    }
+
+    CustomerIndex entry;
+    while (fread(&entry, sizeof(CustomerIndex), 1, indexFile) == 1) {
+        if (entry.customerID == customerID) {
+            fclose(indexFile);
+            return entry.recordPosition;
+        }
+    }
+
+    fclose(indexFile);
+    return -1;  // No matching record found
+}
+
+
 void saveDelInfo(int carNum) {
     FILE *file = fopen("delivery_record.dat", "rb+");
     if (!file) {
-        // File doesn't exist, create it and write a header of zeros
         file = fopen("delivery_record.dat", "wb");
         if (!file) {
             perror("Error opening file");
@@ -447,30 +513,25 @@ void saveDelInfo(int carNum) {
         file = fopen("delivery_record.dat", "rb+");
     }
 
-    int curPackageNum = getLastPackageNumber(file);
-
-    // Find the position of the last record with the same originCustomerID
-    long prevSameSenderPos = -1;
-    DeliveryRecord tempRecord;
-    fseek(file, HEADER_SIZE, SEEK_SET); // Start after the header
-    while (fread(&tempRecord, sizeof(DeliveryRecord), 1, file) == 1) {
-        if (tempRecord.originCustomerID == currentEvents[carNum].origin_customer_id) {
-            prevSameSenderPos = ftell(file) - sizeof(DeliveryRecord);
-        }
-    }
+    // Get the position of the last record for this sender
+    long prevPos = getPreviousSenderPosition("customer_index.dat", currentEvents[carNum].origin_customer_id);
 
     DeliveryRecord newRecord = {
-        .packageNum = curPackageNum,
+        .packageNum = getLastPackageNumber(file),
         .time = currentEvents[carNum].time,
         .event = currentEvents[carNum].event,
         .originCustomerID = currentEvents[carNum].origin_customer_id,
         .destinationCustomerID = currentEvents[carNum].destination_customer_id,
         .packageWeight = currentEvents[carNum].package_weight,
         .deliveryTime = tickTime,
-        .prevSameSenderPos = prevSameSenderPos
+        .prevSameSenderPos = prevPos
     };
 
     fseek(file, 0, SEEK_END);
+    long newRecordPos = ftell(file);
     fwrite(&newRecord, sizeof(DeliveryRecord), 1, file);
+
+    updateCustomerIndex("customer_index.dat", newRecord.originCustomerID, newRecordPos);
+
     fclose(file);
 }
