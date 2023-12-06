@@ -72,7 +72,8 @@ void queryBillNumber(const char *filename, int billNum) {
 void readSpecificSenderRecords(const char *filename, int senderID) {
     FILE *file = fopen(filename, "rb");
     if (!file) {
-        perror("Error opening file");
+        printf("Error opening file");
+        getchar();
         return;
     }
 
@@ -104,10 +105,9 @@ void readSpecificSenderRecords(const char *filename, int senderID) {
 // The main function
 int main() {
     char filename[] = "delivery_record.dat";
-    int input, packageNum, senderID;
+    int input = 0, packageNum, senderID;
     char fullName[101]; // Buffer to hold the full name
-
-    while (1) {
+    while (input != 3) {
         printf("\nSelect an option:\n");
         printf("1. Query by bill number\n");
         printf("2. Query by sender ID\n");
@@ -128,7 +128,7 @@ int main() {
                 break;
             case 3:
                 printf("Exiting program.\n");
-                return 0;
+                break;
             default:
                 printf("Invalid choice, please enter 1, 2, or 3.\n");
                 break;
