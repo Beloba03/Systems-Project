@@ -38,7 +38,7 @@ Building file structure:
 #define E_NUM 7
 #define NE_NUM 8
 #define MAX_QUAD_LENGTH 4
-#define MAX_CAR_NUM 4
+#define MAX_CAR_NUM 10
 #define UPDATE_INPUT_OFFSET 7
 #define BUILDING_OFFSET 2
 #define LAST_STREET_OFFSET 3

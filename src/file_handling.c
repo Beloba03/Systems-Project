@@ -1,13 +1,13 @@
 /*
-Read each entry in the file and check if the time matches the current time. Then look for a car at its destination.
-Set that cars destination to the pickup location then delivery location.
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+December 6, 2023
+
+This module contains file handling functions
 */
 
 #include "car_header.h"
 #include "file_handling_header.h"
 #include "linked_list_header.h"
-
-char *delimiter = ",\t\n ";
 
 
 

@@ -1,6 +1,6 @@
 /*
-Task 5 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
-November 3, 2023
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+December 6, 2023
 
 This is the main module for the AEDV program. It contains the main function which controls
 and calls all of the other functions
@@ -9,8 +9,10 @@ and calls all of the other functions
 // Include the building generator header.
 #include "BldgGen.h"
 #include "linked_list_header.h"
-int tickTime = 0;
-int numCars = 0;
+
+int tickTime = 0; // Main time variable
+int numCars = 0; // Number of cars
+
 // Main function to demonstrate the building generator.
 int main(int argc, char *argv[]) {
 

@@ -3,7 +3,7 @@
 #include "linked_list_header.h"
 #include <time.h>
 
-#define MAX_VIN_COUNT 4
+#define MAX_VIN_COUNT 10
 
 
 // Struct to define save data
@@ -25,16 +25,17 @@ typedef struct {
 typedef struct {
     unsigned int x;     // x-position
     unsigned int y;     // y-position
-    unsigned int endFloor;
+    unsigned int endFloor; // Floor of the destination
     LinkedList locQueue;    // Queue of locations
     unsigned int delTime; // Current Delivery Time
-    COORD endIntersection;
-    COORD endPos;
-    unsigned char endIntersectionStatus;
-    CarDirection endDirection;
-    VehicleRecord vehicleRecord;
+    COORD endIntersection; // Intersection of the destination
+    COORD endPos; // Destination
+    unsigned char endIntersectionStatus; // Car's status
+    CarDirection endDirection; // How to move to enter parking spot
+    VehicleRecord vehicleRecord; // Vehicle information 
 } Car;
 
+// Structure to define a delivery request
 typedef struct {
     int time;
     char event;

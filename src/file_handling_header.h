@@ -30,11 +30,13 @@ typedef struct {
     long prevSameSenderPos; // Field to store the position of the previous record with the same sender
 } DeliveryRecord;
 
+char *delimiter = ",\t\n ";
+
 // External Variables
 extern Car *car;
 extern EventRecord *currentEvents;
 extern int numCars;
 extern int tickTime;
-extern void calcIntersection(int x, int y, int carNum);
 
 // External Functions
+extern void calcIntersection(int x, int y, int carNum);

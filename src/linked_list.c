@@ -1,3 +1,10 @@
+/*
+Task 6 - Ben Babineau (B00891217), Aaron Koshy (B00885234)
+December 6, 2023
+
+This module contains functions relating to the car delivery queue linked list
+*/
+
 #include "linked_list_header.h"
 #include "BldgGen.h"
 void enqueue(int carNum, location loc) {
