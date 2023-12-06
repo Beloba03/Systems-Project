@@ -18,10 +18,10 @@ void getCustomerNameById(int custID, char *fullName) {
     }
 
     Customer customer;
-    fseek(file, sizeof(Customer) * (custID - 1), SEEK_SET);
-    if (fread(&customer, sizeof(Customer), 1, file) == 1) {
+    fseek(file, sizeof(Customer) * (custID - 1), SEEK_SET); // Seek to the customer's record
+    if (fread(&customer, sizeof(Customer), 1, file) == 1) { // Print the customer's full name if the read is successful
         sprintf(fullName, "%s %s", customer.firstName, customer.lastName);
-    } else {
+    } else { // If the read fails, set the name to "Unknown"
         strcpy(fullName, "Unknown");
     }
 
@@ -55,11 +55,10 @@ void queryBillNumber(const char *filename, int billNum) {
             printf("Sender Name: %s\n", senderName);
             printf("Receiver Name: %s\n", receiverName);
             printf("Delivery Time: %d\n", record.deliveryTime);
-        } else {
-            // If the record's bill number doesn't match, it's likely due to deleted or unused records.
+        } else { // If the bill number does not match, print a warning
             printf("Record found, but bill number does not match. Possible data inconsistency.\n");
         }
-    } else {
+    } else { // If the read fails, print a warning
         printf("No record found for Bill Number: %d. Ensure the bill number is correct and try again.\n", billNum);
     }
 
@@ -67,51 +66,58 @@ void queryBillNumber(const char *filename, int billNum) {
 }
 
 void readSpecificSenderRecords(const char *filename, int senderID) {
+    // Open the file in binary read mode
     FILE *file = fopen(filename, "rb");
     if (!file) {
         perror("Error opening file");
         return;
     }
 
+    // Move to the end of the file to determine its size
     fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    int found = 0;  // Flag to indicate if any records are found for the sender
+    long fileSize = ftell(file); // Get the size of the file
+    int found = 0; // Flag to indicate if any records are found for the sender
 
+    // Output header for the records
     printf("Records for Sender ID %d:\n", senderID);
     printf("Package Num | Destination ID\n");
     printf("----------------------------------------------------\n");
 
-    // Iterate backwards through the file
+    // Iterate backwards through the file, starting from the last record
     for (long position = fileSize - sizeof(DeliveryRecord); position >= sizeof(DeliveryRecord); position -= sizeof(DeliveryRecord)) {
-        fseek(file, position, SEEK_SET);
+        fseek(file, position, SEEK_SET); // Move to the current position
         DeliveryRecord record;
+
+        // Read a delivery record from the file
         if (fread(&record, sizeof(DeliveryRecord), 1, file) == 1) {
+            // Check if the record's sender ID matches the queried sender ID
             if (record.originCustomerID == senderID) {
-                found = 1;
+                found = 1; // Mark that we have found a record
+                // Print the details of the record
                 printf("%11d | %14d\n", record.packageNum, record.destinationCustomerID);
 
-                // If there is no previous record for this sender, stop the search
+                // If this is the first record of the sender, exit the loop
                 if (record.prevSameSenderPos == -1) {
                     break;
                 }
 
-                // Set the position to the previous record of the same sender
+                // Update the position to the previous record of the same sender
                 position = record.prevSameSenderPos + sizeof(DeliveryRecord);
-                continue;
             }
         } else {
-            // If read fails, break out of the loop
+            // If reading the record fails, exit the loop
             break;
         }
     }
 
+    // If no records were found, print a message
     if (!found) {
         printf("No records found for Sender ID %d.\n", senderID);
     }
 
+    // Close the file
     fclose(file);
 }
-
 
 // The main function
 int main() {

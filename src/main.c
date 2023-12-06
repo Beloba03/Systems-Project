@@ -15,8 +15,6 @@ int numCars = 0; // Number of cars
 
 // Main function to demonstrate the building generator.
 int main(int argc, char *argv[]) {
-
-    tickTime = 0; // CHANGE TO GET TIME FROM SAVE FILE
     
     // Check if the user has provided the correct number of arguments.
     if (argc != 2) {
