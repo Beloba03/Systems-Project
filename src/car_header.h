@@ -3,6 +3,8 @@
 #include "linked_list_header.h"
 #include <time.h>
 
+#define MAX_VIN_COUNT 4
+
 
 // Struct to define save data
 typedef struct {

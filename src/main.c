@@ -29,32 +29,28 @@ int main(int argc, char *argv[]) {
         return 1;       // Return an error code.
     }
     setConsoleBufferSizeAndWindow(1000, 600, 80, 80); // Set buffer and window sizes.
-     // Read the data from the file and set up the city grid layout.
-    read_file();
-    sortVehicles();
-    // Prepare the console for the animation.
-    staticCarNum();
-    sortEvents();
-    convCustToRel();
-    
-    // Variables to track the car's movement on the console.
-    int destStatus = 0, wasDKeyPressed = 0;
+    read_file(); // Read the data from the file and set up the city grid layout.
+    convCustToRel(); // Convert the customer file to a realative file
+    sortVehicles(); // Sort the vehicle file and ask user what vehicles they want to use
+    sortEvents(); // Sort the event file be time
+
+
     while (GetAsyncKeyState(VK_ESCAPE) >= 0) {  // Run program until user presses 'esc'.
         printTime(tickTime);    // Print the current time.
+
         // Animate each car on the grid.
-        int testNumCars = numCars;
         for (int i = 0; i < numCars; i++) {
-            int endIX = car[i].endIntersection.X, endIY = car[i].endIntersection.Y, endX = car[i].endPos.X, endY = car[i].endPos.Y, curx = car[i].x, cury = car[i].y;
             animateCarNew(i);
         }
-        tickTime++;
-        Sleep(20);
+        tickTime++; // Increment the time.
+        Sleep(20); // Sleep for 20 milliseconds so cars don't teleport.
     }
-    // Set the cursor position to the bottom of the grid.
-    setCursorPosition(0, SCALE_FACTOR*ybldg+3);
+
+    setCursorPosition(0, SCALE_FACTOR*ybldg); // Set the cursor position to the bottom of the grid.
     printf("\nDone\n");  // Inform the user that the animation is complete.
 
     (void) getchar();    // Wait for a character input before exiting.
+    getchar();
 
     // Clean up resources.
     freeGrid(ybldg);

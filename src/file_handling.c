@@ -271,10 +271,25 @@ int compareVehicleRecords(const void *a, const void *b) {
     return recordA->vin - recordB->vin; // Sorting by VIN
 }
 
-// Main function to sort vehicles.
 int sortVehicles(int end) {
     FILE *inFile = fopen("vehicles.txt", "r");
+    if (!inFile) {
+        perror("Error opening file");
+        return 1;
+    }
+
     char buffer[MAX_LINE_LENGTH];
+    int userVins[MAX_VIN_COUNT];
+    int numUserVins = 0;
+
+    // Ask the user for VINs
+    printf("Enter the VINs you want to process (0 to end):\n");
+    int inputVin;
+    while (1) {
+        scanf("%d", &inputVin);
+        if (inputVin == 0) break;
+        userVins[numUserVins++] = inputVin;
+    }
 
     // Read and discard the header line.
     if (!fgets(buffer, sizeof(buffer), inFile)) {
@@ -282,15 +297,7 @@ int sortVehicles(int end) {
         return 2; // Error reading header line
     }
 
-    int numEntries = 0;
-    while (fgets(buffer, sizeof(buffer), inFile)) {
-        numEntries++;
-    }
-    rewind(inFile);
-    // Discard the header line again after rewind.
-    fgets(buffer, sizeof(buffer), inFile); 
-
-    VehicleRecord *records = malloc(numEntries * sizeof(VehicleRecord)+1);
+    VehicleRecord *records = malloc(MAX_VIN_COUNT * sizeof(VehicleRecord));  // Adjust size as needed
     if (records == NULL) {
         fclose(inFile);
         return 3; // Error allocating memory
@@ -300,6 +307,20 @@ int sortVehicles(int end) {
 
     // Read and parse each line.
     while (fgets(buffer, sizeof(buffer), inFile)) {
+        int vin;
+        sscanf(buffer, "%d", &vin);  // Assuming VIN is the first field in the line
+
+        // Check if the VIN is in the user's list
+        int found = 0;
+        for (int i = 0; i < numUserVins; i++) {
+            if (vin == userVins[i]) {
+                found = 1;
+                break;
+            }
+        }
+        if (!found) continue;  // Skip this record if VIN not in user list
+
+        // Parsing and storing the record
         char *token = strtok(buffer, delimiter);
         records[recordCount].vin = atoi(token);
 
@@ -335,6 +356,7 @@ int sortVehicles(int end) {
 
         recordCount++;
     }
+
     numCars = recordCount;
     car = (Car*)malloc((numCars) * sizeof(Car)+1);
     currentEvents = (EventRecord*)malloc((numCars) * sizeof(EventRecord)+1);
@@ -349,6 +371,7 @@ int sortVehicles(int end) {
         printf("Error allocating memory for car array");
         exit(EXIT_FAILURE);
     }
+
 
     // Sort the records by VIN.
     qsort(records, recordCount, sizeof(VehicleRecord), compareVehicleRecords);

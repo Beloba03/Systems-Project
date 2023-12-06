@@ -6,6 +6,7 @@ This module contains functions relating to reading and creating the map
 */
 
 #include "BldgGen.h"
+// #define DEBUG // Uncomment this line to print the city grid with the street directions
 
 // Declaration of a 2D character array for city grid layout
 char** cityGrid;

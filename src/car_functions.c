@@ -51,49 +51,6 @@ enum QUAD mapInputToQuad(char quadString[MAX_QUAD_LENGTH]) {
     }
 }
 
-#ifdef MANUAL_ENTRY
-// Gets the start and end coordinates for the cars from the user
-int getStartAndEndCoordinates() {
-    int maxCars;
-    int numCars;
-    COORD endPos;
-    char quadString[MAX_QUAD_LENGTH];
-    printf("How many AEDVs would you like to create?: ");
-    scanf("%i", &numCars);
-    COORD tempCoord[numCars];
-    car = (Car*)malloc(numCars * sizeof(Car)+1);
-    maxCars = numCars;
-    for(int i = 0; i < numCars; i++)
-    {
-        car[i].endIntersectionStatus = 0;
-        printf("Enter the X, Y coordinate for the starting point for car %i: ", i);
-        scanf("%i%i", &tempCoord[i].X, &tempCoord[i].Y);
-        printf("Enter the X, Y, Quad(N,E,S,...) coordinate for the ending point for car %i: ", i);
-        scanf("%i%i%s", &endPos.X, &endPos.Y, &quadString);
-    }
-
-    printf("\n");
-    // clear the input buffer
-    while((getchar()) != '\n');
-
-    startOffset = getCursorPosition();
-
-    for(int i = 0; i < numCars; i++)
-    {
-        car[i].x = tempCoord[i].X;
-        car[i].y = tempCoord[i].Y;
-        calcIntersection(endPos.X, endPos.Y, i);
-    }
-    return numCars;
-    
-}
-#else
-void staticCarNum()
-{
-    
-}
-#endif
-
 // Function to update car's position on the console
 void updateCar(CarDirection carDirection, int carNum) {
     COORD prevPos = (COORD){car[carNum].x, car[carNum].y+startOffset.Y};  // Store the previous position (before updating)
@@ -195,8 +152,6 @@ int greaterOrLess(int pos1, int pos2)
 
 }
 
-// 4 car test input: 1 1 55 32 S 7 9 19 19 S 23 19 49 49 S 25 23 3 7 S
-
 // This function calculates the best intersection for the car to navigate to to reach its end point.
 void calcIntersection(int x, int y, int carNum)
 {
@@ -215,10 +170,10 @@ void calcIntersection(int x, int y, int carNum)
         for(int i = 0; (x-1)%6 != 0; i++)
         {
             int stDir = getStDir(y);
-            if(stDir == 0)
+            if(stDir == 0) // If the street is bidirectional, find the direction that points towards the end point
                 stDir = greaterOrLess(car[carNum].x, car[carNum].endPos.X);
-            if(stDir == 0)
-                stDir = -1;
+            if(stDir == 0) // If the current street is bidirectional and the end point is in the same street, guess the direction to get started (better logic should be implemented to get absolutly shortest path)
+                stDir = 1;
             x = x-stDir;
         }
 
@@ -268,7 +223,10 @@ void getNextEvent(int carNum)
 }
 void pathFind(int carNum, int reset)
 {
-    static int count[MAX_CAR_NUM] = {0}, startInd[MAX_CAR_NUM] = {0}, shortStopX[MAX_CAR_NUM] = {0}, shortStopY[MAX_CAR_NUM] = {0}, passY[MAX_CAR_NUM] = {0}, startIndAve[MAX_CAR_NUM] = {0}, runOnce[MAX_CAR_NUM] = {0}; // Static variables to keep track of the car's movement
+    static int count[MAX_CAR_NUM] = {0}, 
+    startInd[MAX_CAR_NUM] = {0}, shortStopX[MAX_CAR_NUM] = {0}, 
+    shortStopY[MAX_CAR_NUM] = {0}, passY[MAX_CAR_NUM] = {0}, 
+    startIndAve[MAX_CAR_NUM] = {0}, runOnce[MAX_CAR_NUM] = {0}; // Static variables to keep track of the car's movement
     if(reset == 1) // Reset for next parcel
     {
         count[carNum] = 0;
@@ -280,90 +238,94 @@ void pathFind(int carNum, int reset)
         runOnce[carNum] = 0;
         return;
     }
-
-    int dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X); // Direction of the car from the end intersection in the x direction
+    int dirY = greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y), // Direction of the car from the end intersection in the y direction
+    dir = greaterOrLess(car[carNum].x, car[carNum].endIntersection.X), // Direction of the car from the end intersection in the x direction
+    endAvDir = getAvDir(car[carNum].endIntersection.X), // Direction of the end avenue
+    curAvDir = getAvDir(car[carNum].x), // Direction of the current avenue
+    endStDir = getStDir(car[carNum].endIntersection.Y), // Direction of the end street
+    curStDir = getStDir(car[carNum].y); // Direction of the current street
     if(runOnce[carNum] == 0)
     {
-        if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
+        if(dirY == endAvDir && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
         {
             startInd[carNum] = 1;
             shortStopX[carNum] = 1;
         }
-        if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == getStDir(car[carNum].endIntersection.Y) && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
+        if(-dir == endStDir && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && -dir != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
         {
             shortStopY[carNum] = 1;
             count[carNum] = 12;
         }
         runOnce[carNum] = 1;
     }
-    if((getStDir(car[carNum].y) == dir || getStDir(car[carNum].y) == 0) && shortStopX[carNum] == 0 && dir != 0) // Checks if the car is on the correct street (it points towards the end point)
+    if((curStDir == dir || curStDir == 0) && shortStopX[carNum] == 0 && dir != 0) // Checks if the car is on the correct street (it points towards the end point)
     {
-        if(passY[carNum] == 1 || dir == 1) // Move the car in the correct direction
+        if(passY[carNum] == 1 || dir == 1) // Right is valid
             updateCar(MOVE_RIGHT, carNum);
-        else if(passY[carNum] == -1 || dir == -1)
+        else if(passY[carNum] == -1 || dir == -1) // Left is valid, never can be bidirectional
             updateCar(MOVE_LEFT, carNum);
         startInd[carNum] = 1;
-        if((getAvDir(car[carNum].x) == greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0) && getStDir(car[carNum].y) != 0 && getStDir(car[carNum].y != greaterOrLess(car[carNum].x, car[carNum].endIntersection.X))) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
+        if((curAvDir == -dirY && curAvDir != 0) && curStDir != 0 && getStDir(car[carNum].y) != -dir) // If the car is on the correct street but the street points in the wrong direction, move the car in the direction of the avenue
             startIndAve[carNum] = 1;
-        if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
+        if(dirY == endAvDir && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
             shortStopX[carNum] = 1;
-        if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == getStDir(car[carNum].endIntersection.Y) && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
+        if(-dir == endStDir && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && -dir != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
         {
             shortStopY[carNum] = 1;
             count[carNum] = 12;
         }
     }
     // If in the end col and the direction is wrong: move in row dir to next col
-    else if(car[carNum].x == car[carNum].endIntersection.X && (getAvDir(car[carNum].x) != greaterOrLess(car[carNum].y, car[carNum].endIntersection.Y) && getAvDir(car[carNum].x) != 0))
+    else if(car[carNum].x == car[carNum].endIntersection.X && (curAvDir != -dirY && curAvDir != 0))
     {
-        if(getStDir(car[carNum].y) == 1)
+        if(curStDir == 1) // Right is valid
             updateCar(MOVE_RIGHT, carNum);
-        else if(getStDir(car[carNum].y) == -1)
+        else if(curStDir == -1) // Left is valid
             updateCar(MOVE_LEFT, carNum);
-        else if(getStDir(car[carNum].y) == 0)
+        else if(curStDir == 0) // Both directions are valid so find the one pointing towards the end intersection
         {
-            if(getStDir(car[carNum].endIntersection.Y) == 1)
+            if(endStDir == 1)
             {
                 updateCar(MOVE_LEFT, carNum);
                 passY[carNum] = -1;
             }
                 
-            else if(getStDir(car[carNum].endIntersection.Y) == -1)
+            else if(endStDir == -1)
             {
                 updateCar(MOVE_RIGHT, carNum);
                 passY[carNum] = 1;
             }
         }
     }
-    else if(getAvDir(car[carNum].x) == 2 && startIndAve[carNum] == 0) // Move in the direction of the current street
+    else if(curAvDir == 2 && startIndAve[carNum] == 0) // Move in the direction of the current street
     {
-        if(getStDir(car[carNum].y) == 1) // Move the car in the correct direction
+        if(curStDir == 1) // Right is valid
             updateCar(MOVE_RIGHT, carNum);
-        else if(getStDir(car[carNum].y) == -1)
+        else // Left is valid, never can be bidirectional
             updateCar(MOVE_LEFT, carNum);
-        if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == getAvDir(car[carNum].endIntersection.X) && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
+        if(dirY == endAvDir && (car[carNum].endIntersection.X == car[carNum].x+6 || car[carNum].endIntersection.X == car[carNum].x-6)) // Checks if the destination avenue points towards the destination. If not, it will stop the car one avenue short.
         {
             startInd[carNum] = 1;
             shortStopX[carNum] = 1;
         }
-        if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == getStDir(car[carNum].endIntersection.Y) && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
+        if(-dir == endStDir && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && -dir != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
         {
             shortStopY[carNum] = 1;
             count[carNum] = 12;
         }
     }
-    else if ((getStDir(car[carNum].y) == -dir || getStDir(car[carNum].y) == 0) && startInd[carNum] == 0) // Moves the car along the current avenue until the next street in the right direction (this is if it starts where there is no street or if the street points in the wrong direction)
+    else if ((curStDir == -dir || curStDir == 0) && startInd[carNum] == 0) // Moves the car along the current avenue until the next street in the right direction (this is if it starts where there is no street or if the street points in the wrong direction)
     {
         passY[carNum] = 0;
-        if(getAvDir(car[carNum].x) == 1)
+        if(curAvDir == 1) // Down is valid
             updateCar(MOVE_DOWN, carNum);
-        else if(getAvDir(car[carNum].x) == -1)
+        else if(curAvDir == -1) // Up is valid
             updateCar(MOVE_UP, carNum);
-        else if(getAvDir(car[carNum].x) == 0)
+        else if(curAvDir == 0) // Both directions are valid so find the one pointing towards the end intersection
         {
-            if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 1)
+            if(dirY == 1)
                 updateCar(MOVE_UP, carNum);
-            else if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == -1)
+            else if(dirY == -1)
                 updateCar(MOVE_DOWN, carNum);
         }
         count[carNum]++;
@@ -371,31 +333,29 @@ void pathFind(int carNum, int reset)
     else if(car[carNum].y != car[carNum].endIntersection.Y && shortStopY[carNum] == 0) // Move along avenue until the end intersection
     {
         passY[carNum] = 0;
-        if(getAvDir(car[carNum].x) == 1)
+        if(curAvDir == 1) // Down is valid
             updateCar(MOVE_DOWN, carNum);
-        else if(getAvDir(car[carNum].x) == -1)
+        else if(curAvDir == -1) // Up is valid
             updateCar(MOVE_UP, carNum);
-        else if(getAvDir(car[carNum].x) == 0)
+        else if(curAvDir == 0) // Both directions are valid so find the one pointing towards the end intersection
         {
-            if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 1)
+            if(dirY == 1)
                 updateCar(MOVE_UP, carNum);
-            else if(greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == -1)
+            else if(dirY == -1)
                 updateCar(MOVE_DOWN, carNum);
         }
-        
-        if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == getStDir(car[carNum].endIntersection.Y) && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
+        if(-dir == endStDir && (car[carNum].endIntersection.Y+6 == car[carNum].y|| car[carNum].endIntersection.Y-6 == car[carNum].y) && shortStopX[carNum] == 1 && -dir != 0) // Stop 1 block before the end intersection if the end street points in the wrong direction and it isn't in the end avenue
         {
             shortStopY[carNum] = 1;
             count[carNum] = 12;
         }
-        //debugPrint(car[carNum].y, car[carNum].endIntersection.Y, getStDir(car[carNum].y), shortStopY[carNum]);
     }
     else if(shortStopY[carNum] == 1) // Move past the end intersection by one block
     {
         passY[carNum] = 0;
-        if(getAvDir(car[carNum].x) == 1)
+        if(curAvDir == 1) // Down is valid
             updateCar(MOVE_DOWN, carNum);
-        else
+        else // Up is valid, never can be bidirectional
             updateCar(MOVE_UP, carNum);
                 count[carNum]--;
         if(count[carNum] == 0)
@@ -406,9 +366,9 @@ void pathFind(int carNum, int reset)
     }
     else if(shortStopY[carNum] == 2) // Move one block back towards the end intersection in the street direction
     {
-        if(dir == 1)
+        if(dir == 1) // Right is valid
             updateCar(MOVE_RIGHT, carNum);
-        else if(dir == -1)
+        else if(dir == -1) // Left is valid
             updateCar(MOVE_LEFT, carNum);
         count[carNum]--;
         startIndAve[carNum] = 1;
@@ -420,18 +380,18 @@ void pathFind(int carNum, int reset)
     }
     else if(shortStopY[carNum] == 3 && count[carNum] > 0) // Move one block towards the end intersection in the avenue direction
     {
-        if(getAvDir(car[carNum].x) == 1)
+        if(curAvDir == 1) // Down is valid
             updateCar(MOVE_DOWN, carNum);
-        else
+        else // Up is valid, never can be bidirectional
             updateCar(MOVE_UP, carNum);
         count[carNum]--;
     }
     else if(car[carNum].y == car[carNum].endIntersection.Y)
     {
         shortStopX[carNum] = 0;
-        if(dir == 1) // Move the car in the correct direction
+        if(dir == 1) // Right is valid
             updateCar(MOVE_RIGHT, carNum);
-        else if(dir == -1)
+        else if(dir == -1) // Left is valid
             updateCar(MOVE_LEFT, carNum);
     }
 }
@@ -534,10 +494,6 @@ void animateCarNew(int carNum)
     else if(car[carNum].endIntersectionStatus == 8)
     {
         updateCar(STOP, carNum);
-    }
-    else
-    {
-        //car[carNum].endIntersectionStatus = 4;
     }
     if(greaterOrLess(car[carNum].endIntersection.X, car[carNum].x) == 0 && greaterOrLess(car[carNum].endIntersection.Y, car[carNum].y) == 0 && car[carNum].endIntersectionStatus == 0) // Checks if the car has reached the end intersection
         {
